@@ -1,0 +1,21 @@
+public class Pista
+{
+
+    public Pista()
+    {
+        
+    }
+    public Pista(int IdPista, string NombrePista)
+    {
+        this.IdPista = IdPista;
+        this.NombrePista = NombrePista;
+    }
+    
+[Key]
+    public int IdPista { get; set; }
+
+    public string NombrePista { get; set; }
+    public int NPersonas{get; set;}
+    public double Precio{get; set;}
+    public int? Stock{get; set;}
+}
