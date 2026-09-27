@@ -18,6 +18,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public DbSet<Inscripcion> Inscripciones { get; set; }
+    public DbSet<TipoDeporte> TipoDeportes{get;set;} 
+    public DbSet<Pista> Pistas { get; set; }
+    DbSet<Competicion> Competiciones{get;set;}
+    public DbSet<Material> Materials { get; set; }
+    public DbSet<PistaReservada> PistaReservada { get; set; }
 
 
 
