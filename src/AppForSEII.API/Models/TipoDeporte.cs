@@ -18,4 +18,11 @@ public class TipoDeporte
     public List<string> Materiales{get; set;}
     public List<string> Competiciones{get; set;}
     public string  NombreTipoDeporte{get; set;}
+
+
+    //Atributo necesario para el CU4,id y nombre ya estan implementados
+     public string? Descripcion { get; set; }//descripcion puede ser null
+
+    //relacion con ClaseDeportiva da error cuando este en development cambiar
+    //public List<ClaseDeportiva> ClasesDeportivas { get; set; } = new List<ClaseDeportiva>();
 }
