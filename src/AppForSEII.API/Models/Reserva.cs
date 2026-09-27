@@ -7,7 +7,7 @@ public class Reserva
     }
     public Reserva(int Id)
     {
-        ID = Id;
+        Id = Id;
     }
     
 [Key]
