@@ -17,7 +17,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
 
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
-    public DbSet<PistaReservada> YourClasses { get; set; }
+    public DbSet<PistaReservada> PistaReservada { get; set; }
 
 
 
