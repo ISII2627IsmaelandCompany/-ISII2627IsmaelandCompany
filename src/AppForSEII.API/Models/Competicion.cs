@@ -13,7 +13,6 @@ public class Competicion
         Precio = precio;
     }
 
-
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
     public DateTime? Fecha { get; set; } 
     
