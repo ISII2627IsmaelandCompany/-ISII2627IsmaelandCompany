@@ -12,7 +12,7 @@ public class ClaseDeportiva
     public int Id { get; set; }
 
     //comentado porque faltan clases y da error
-    //public TipoDeporte TipoDeporte { get; set; } = null!; 
+    public TipoDeporte TipoDeporte { get; set; } = null!; //el null! es para mas adelante para la hora de hacer la relacion entre las clases
     //public List<ClaseInscrita> ClasesInscritas { get; set; } = new List<ClaseInscrita>();
 
     //IMP => falta averiguar lo de las foreign key
