@@ -13,8 +13,9 @@ namespace AppForSEII.API.Models
      [Required]//obligatorio
     public string DatosPago { get; set; }=string.Empty;
     [Required]//obligatorio
-    //[DataType(DataType.Date), Display(Name ="Release Date")] //error
-    //[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]// esperar a ver el formato que dicen de usar
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]// esperar a ver el formato que dicen de usar
+    [System.ComponentModel.DataAnnotations.Display(Name ="Fecha Inscripcion")] 
     public DateTime FechaInscripcion { get; set; }
 
    
@@ -23,6 +24,9 @@ namespace AppForSEII.API.Models
     //public MetodoPago MetodoPago { get; set; }
 
     [Required]
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)]
+    [System.ComponentModel.DataAnnotations.Display(Name ="Precio Total")] 
+
     [Precision(5, 2)]//precision 5 digitos 2 decimales
     [Range(0, 999.99,ErrorMessage = "El precio total no puede ser negativo y máximo 999.99")]//rango de precio
 
