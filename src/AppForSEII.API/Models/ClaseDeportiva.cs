@@ -15,7 +15,6 @@ public class ClaseDeportiva
     public TipoDeporte TipoDeporte { get; set; } = null!; //el null! es para mas adelante para la hora de hacer la relacion entre las clases
     //public List<ClaseInscrita> ClasesInscritas { get; set; } = new List<ClaseInscrita>();
 
-    //IMP => falta averiguar lo de las foreign key
     public int TipoDeporteId { get; set; }
 
 
@@ -25,9 +24,10 @@ public class ClaseDeportiva
     public string Descripcion { get; set; }= string.Empty;//deja en vacio el huceo y no a null
 
     [Required]
-    //IMP=> PREGUNTAR EL ERROR ESTE 
-    //[DataType(DataType.Date), Display(Name ="Fecha y hora")] 
-    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+    
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+    [System.ComponentModel.DataAnnotations.Display(Name = "Fecha y Hora")]
     public DateTime FechaHora { get; set; }
     public string? Lugar { get; set; } //lugar puede ser un atributo a null por la '?'
 
@@ -41,10 +41,10 @@ public class ClaseDeportiva
 
     [Required]
     //Preguntar lo mismo del error
-    //[DataType(DataType.Currency)] 
-    //[Display(Name = "Precio Unitario")]
-    [Precision(5, 2)]//5 digitos 2 decimales
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)]   
     [Range(0,999.99,ErrorMessage ="precio no puede ser negativo y maximo 999.99")]//rango para que no se salga
+    [System.ComponentModel.DataAnnotations.Display(Name = "Precio unitario")]
+    [Precision(5, 2)]//5 digitos 2 decimales
 
     public decimal PrecioUnitario{get;set;}
 
