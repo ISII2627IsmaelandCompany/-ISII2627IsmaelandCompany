@@ -25,7 +25,7 @@ namespace AppForSEII.API.Models
         [Range(1, 999, ErrorMessage = "El ID debe estar entre 1 y 999.")]
         public int IdMaterial { get; set; }
 
-
+        [Key]
         [Range(1, 999, ErrorMessage = "El ID debe estar entre 1 y 999.")]
         public int IdAlquiler { get; set; }
 
