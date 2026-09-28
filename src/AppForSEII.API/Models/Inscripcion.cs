@@ -28,11 +28,34 @@ namespace AppForSEII.API.Models
 
     public decimal PrecioTotal { get; set; }
 
+    //atributos CU 3
+    [Required]
+    public string ApellidosUsuario { get; set; } = string.Empty;
+    [Required]
+    [Range(10000000, 99999999, ErrorMessage = "El DNI debe tener 8 dígitos")]
+    public string DNI { get; set; } = string.Empty;
+    [Required]
+    public string NombreUsuario { get; set; } = string.Empty;
+    [Required]
+    [Range(600000000, 799999999, ErrorMessage = "El teléfono debe tener 9 dígitos y empezar por 6 o 7")]
+    public string Telefono { get; set; } = string.Empty;
+
     //constructores
 
     public Inscripcion()
         {
         }
+    public Inscripcion(ApplicationUser cliente, string datosPago, DateTime fechaInscripcion, decimal precioTotal, string apellidosUsuario, string dni, string nombreUsuario, string telefono)
+    {
+        Cliente = cliente;
+        DatosPago = datosPago;
+        FechaInscripcion = fechaInscripcion;
+        PrecioTotal = precioTotal;
+        ApellidosUsuario = apellidosUsuario;
+        DNI = dni;
+        NombreUsuario = nombreUsuario;
+        Telefono = telefono;
+    }
 
     
 
