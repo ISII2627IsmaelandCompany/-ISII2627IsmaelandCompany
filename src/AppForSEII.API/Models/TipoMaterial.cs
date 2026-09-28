@@ -11,7 +11,7 @@ namespace AppForSEII.API.Models
             NombreTipoMaterial = nombreTipoMaterial;
         }
     
-        
+        [Key]
         [Range(1, 999, ErrorMessage = "El ID debe estar entre 1 y 999.")]
         public int IdTipoMaterial { get; set; }
 
