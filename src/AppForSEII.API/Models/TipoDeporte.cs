@@ -3,24 +3,30 @@ namespace AppForSEII.API.Models
 
 public class TipoDeporte
 {
+    //atributos de la clase
 
-    public TipoDeporte()
-    {
-        
-    }
-    public TipoDeporte(int id, string nombre)
-    {
-        Id = id;
-        Nombre = nombre;
-    }
-    
-[Key]
+
+    //Primarykey
+    [Key]
     public int Id { get; set; }
 
-    public string Nombre { get; set; }
-    public List<string> Materiales{get; set;}
-    public List<string> Competiciones{get; set;}
-    public string  NombreTipoDeporte{get; set;}
+    public List<Pista> Pistas { get; set; } = new List<Pista>(); //Relacion 1--N  
+
+    public int IdPista { get; set; }// FK para relacionar TipoDeporte con Pista
+
+
+    [StringLength(50, ErrorMessage = "El nombre no puede tener más de 50 caracteres.", MinimumLength = 1)]
+    public string Nombre { get; set; }= string.Empty;//para no tener null
+
+    [Required]
+    [StringLength(50, ErrorMessage = "El nombre no puede tener más de 50 caracteres.", MinimumLength = 1)]
+    public string NombreTipoDeporte { get; set; }= string.Empty;//para no tener null
+
+    public List<Competicion> Competiciones { get; set; } = new List<Competicion>();//Relacion 1--N
+
+    public List<Material> Materiales { get; set; } = new List<Material>();
+
+
 
 
     //Atributo necesario para el CU4,id y nombre ya estan implementados
