@@ -1,17 +1,5 @@
 public class Competicion
 {
-    public Competicion()
-    {
-    }
-    public Competicion(int id, string nombre, string lugar, DateTime fecha, int plazas, float precio)
-    {
-        Id = id;
-        Nombre = nombre;
-        Lugar = lugar;
-        Fecha = fecha;
-        Plazas = plazas;
-        Precio = precio;
-    }
 
     [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
