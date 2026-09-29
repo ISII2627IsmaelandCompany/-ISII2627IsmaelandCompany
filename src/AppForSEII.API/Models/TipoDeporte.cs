@@ -1,21 +1,32 @@
+//Para organizar donde se encuentra
 public class TipoDeporte
 {
+    //atributos de la clase
 
-    public TipoDeporte()
-    {
-        
-    }
-    public TipoDeporte(int id, string nombre)
-    {
-        Id = id;
-        Nombre = nombre;
-    }
-    
-[Key]
+
+    //Primarykey
+    [Key]
     public int Id { get; set; }
 
-    public string Nombre { get; set; }
-    public List<string> Materiales{get; set;}
-    public List<string> Competiciones{get; set;}
-    public string  NombreTipoDeporte{get; set;}
+    public Pista Pista { get; set; } = null!; //el null! es para mas adelante para la hora de hacer la relacion entre las clases
+
+    public int IdPista { get; set; }// FK para relacionar TipoDeporte con Pista
+
+
+    public string Nombre { get; set; }= string.Empty;//para no tener null
+
+    [Required]
+    public string NombreTipoDeporte { get; set; }= string.Empty;//para no tener null
+
+    public string? Competiciones { get; set; }//para no tener null
+
+    public string? Materiales { get; set; }= string.Empty;//para no tener null. quiza no necesitan material
+
+
+//relacion con Pista
+    
+
+
+
+
 }
