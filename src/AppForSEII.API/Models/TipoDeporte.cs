@@ -1,4 +1,6 @@
-//Para organizar donde se encuentra
+namespace AppForSEII.API.Models
+{
+
 public class TipoDeporte
 {
     //atributos de la clase
@@ -28,5 +30,10 @@ public class TipoDeporte
 
 
 
+    //Atributo necesario para el CU4,id y nombre ya estan implementados
+     public string? Descripcion { get; set; }//descripcion puede ser null
 
+    //relacion con ClaseDeportiva  
+    public List<ClaseDeportiva> ClasesDeportivas { get; set; } = new List<ClaseDeportiva>(); //relacion TipoDeporte 1 ---- N ClaseDeportiva
+}
 }
