@@ -15,7 +15,7 @@ public class ClaseDeportiva
     public TipoDeporte TipoDeporte { get; set; } = null!; //el null! es para mas adelante para la hora de hacer la relacion entre las clases
     //public List<ClaseInscrita> ClasesInscritas { get; set; } = new List<ClaseInscrita>();
 
-    public int TipoDeporteId { get; set; }
+    public int TipoDeporteId { get; set; }// FK que relaciona ClaseDeportiva con TipoDeporte
 
 
     
@@ -25,7 +25,7 @@ public class ClaseDeportiva
 
     [Required]
     
-    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)] //tipo de dato
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
     [System.ComponentModel.DataAnnotations.Display(Name = "Fecha y Hora")]
     public DateTime FechaHora { get; set; }
