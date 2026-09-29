@@ -11,7 +11,6 @@ public class ClaseDeportiva
     [Key]
     public int Id { get; set; }
 
-    //comentado porque faltan clases y da error
     public TipoDeporte TipoDeporte { get; set; } = null!; //el null! es para mas adelante para la hora de hacer la relacion entre las clases
     //public List<ClaseInscrita> ClasesInscritas { get; set; } = new List<ClaseInscrita>();
 
@@ -40,7 +39,6 @@ public class ClaseDeportiva
     public int PlazasDisponibles { get; set; }
 
     [Required]
-    //Preguntar lo mismo del error
     [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)]   
     [Range(0,999.99,ErrorMessage ="precio no puede ser negativo y maximo 999.99")]//rango para que no se salga
     [System.ComponentModel.DataAnnotations.Display(Name = "Precio unitario")]
