@@ -10,23 +10,22 @@ public class TipoDeporte
     [Key]
     public int Id { get; set; }
 
-    public Pista Pista { get; set; } = null!; //el null! es para mas adelante para la hora de hacer la relacion entre las clases
+    public List<Pista> Pistas { get; set; } = new List<Pista>(); //Relacion 1--N  
 
     public int IdPista { get; set; }// FK para relacionar TipoDeporte con Pista
 
 
+    [StringLength(50, ErrorMessage = "El nombre no puede tener más de 50 caracteres.", MinimumLength = 1)]
     public string Nombre { get; set; }= string.Empty;//para no tener null
 
     [Required]
+    [StringLength(50, ErrorMessage = "El nombre no puede tener más de 50 caracteres.", MinimumLength = 1)]
     public string NombreTipoDeporte { get; set; }= string.Empty;//para no tener null
 
-    public string? Competiciones { get; set; }//para no tener null
+    public List<Competicion> Competiciones { get; set; } = new List<Competicion>();//Relacion 1--N
 
-    public string? Materiales { get; set; }= string.Empty;//para no tener null. quiza no necesitan material
+    public List<Material> Materiales { get; set; } = new List<Material>();
 
-
-//relacion con Pista
-    
 
 
 
