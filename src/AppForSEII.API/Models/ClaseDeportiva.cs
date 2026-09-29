@@ -1,0 +1,67 @@
+//Para organizar donde se encuentra
+namespace AppForSEII.API.Models;
+
+
+public class ClaseDeportiva
+{
+    //atributos de la clase
+
+
+    //Primarykey
+    [Key]
+    public int Id { get; set; }
+
+    public TipoDeporte TipoDeporte { get; set; } = null!; //el null! es para mas adelante para la hora de hacer la relacion entre las clases
+    //public List<ClaseInscrita> ClasesInscritas { get; set; } = new List<ClaseInscrita>();
+
+    public int TipoDeporteId { get; set; }// FK que relaciona ClaseDeportiva con TipoDeporte
+
+
+    
+    [Required]//obligatorio
+    
+    public string Descripcion { get; set; }= string.Empty;//deja en vacio el huceo y no a null
+
+    [Required]
+    
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)] //tipo de dato
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
+    [System.ComponentModel.DataAnnotations.Display(Name = "Fecha y Hora")]
+    public DateTime FechaHora { get; set; }
+    public string? Lugar { get; set; } //lugar puede ser un atributo a null por la '?'
+
+    [Required]
+    public string Monitor { get; set; }= string.Empty;
+
+    [Required]
+    public string Nivel { get; set; }= string.Empty;
+    [Range(0,30,ErrorMessage ="plazas disponibles entre 0 y 30")]//selecciona el rango para las plazas, dice max 30 enunciado
+    public int PlazasDisponibles { get; set; }
+
+    [Required]
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)]   
+    [Range(0,999.99,ErrorMessage ="precio no puede ser negativo y maximo 999.99")]//rango para que no se salga
+    [System.ComponentModel.DataAnnotations.Display(Name = "Precio unitario")]
+    [Precision(5, 2)]//5 digitos 2 decimales
+
+    public decimal PrecioUnitario{get;set;}
+
+    //constructores
+
+    public ClaseDeportiva()
+    {
+        
+    }
+
+    public ClaseDeportiva( string descripcion, DateTime fechaHora, string? lugar, string monitor, string nivel, int plazasDisponibles, decimal precioUnitario)
+    {
+        
+        this.Descripcion = descripcion;
+        this.FechaHora = fechaHora;
+        this.Lugar = lugar;
+        this.Monitor = monitor;
+        this.Nivel = nivel;
+        this.PlazasDisponibles = plazasDisponibles;
+        this.PrecioUnitario = precioUnitario;
+    }
+}

@@ -22,4 +22,14 @@ public class ApplicationUser : IdentityUser
 
     [StringLength(50)]
     public string? Surname {get;set;}
+
+    [Required]
+    [StringLength(9, MinimumLength = 9, ErrorMessage = "El DNI debe tener 9 caracteres")]
+    public string DNI { get; set; } = string.Empty;
+
+    [Required]
+    public int Age { get; set; }
+
+    [Required]
+    public string Sex { get; set; } = string.Empty;
 }

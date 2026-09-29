@@ -12,7 +12,7 @@ namespace AppForSEII.API.Models
             Nombre = nombre;
             Precio = precio;
         }
-        
+        [Key]
         [Range(1, 999, ErrorMessage = "El ID debe estar entre 1 y 999.")]
         public int IdMaterial { get; set; }
 
