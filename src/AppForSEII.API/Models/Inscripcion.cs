@@ -6,21 +6,22 @@ namespace AppForSEII.API.Models
     
         [Key]//PK
         public int Id { get; set; }
-        public ApplicationUser Cliente { get; set; } = null!;
+        public ApplicationUser Cliente { get; set; } // Relación N a 1 con ApplicationUser
 
-    //Lo comento y luego lo quito cuando la clase este creada del todo
-    //public List<ClaseInscrita> ClasesInscritas { get; set; }
+    public IList<ClaseInscrita> ClasesInscritas { get; set; }= new List<ClaseInscrita>();//Relación 1 a N con ClaseInscrita
      [Required]//obligatorio
     public string DatosPago { get; set; }=string.Empty;
     [Required]//obligatorio
-    //[DataType(DataType.Date), Display(Name ="Release Date")] //error
-    //[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]// esperar a ver el formato que dicen de usar
+    [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
+    [System.ComponentModel.DataAnnotations.Display(Name ="Fecha Inscripcion")] 
+    [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]// formato de  fecha
     public DateTime FechaInscripcion { get; set; }
 
    
     
-    //IMP => Falta crear/añadir enum MetodoPago
-    //public MetodoPago MetodoPago { get; set; }
+    
+    public MetodoPago MetodoPago { get; set; }//enum con   Bizum, Efectivo,Tarjeta,Transferencia,Metalico
+   
 
     [Required]
     [Precision(5, 2)]//precision 5 digitos 2 decimales
