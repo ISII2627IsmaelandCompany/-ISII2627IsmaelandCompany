@@ -1,18 +1,17 @@
 //Para organizar donde esta el codigo
 namespace AppForSEII.API.Models
 {
-    
+
 public class ClaseInscrita
 {
        //atributos
-
-        [Key]//Primary key
+    [Key]
     public int Id { get; set; }
 
-    //public ClaseDeportiva ClaseDeportiva { get; set; }= null!;//no sera nulo
+    public ClaseDeportiva ClaseDeportiva { get; set; }= null!;//no sera nulo
     public Inscripcion Inscripcion{get;set;}= null!;//no sera nulo 
-    public int ClaseDeportivaId { get; set; }    // FK que relaciona ClaseInscrita con ClaseDeportiva
-    public int InscripcionId { get; set; }    // FK que relaciona ClaseInscrita con Inscripcion
+    public int ClaseDeportivaId { get; set; }    // FK que relaciona ClaseInscrita con ClaseDeportiva N a 1
+    public int InscripcionId { get; set; }    // FK que relaciona ClaseInscrita con Inscripcion  N a 1
 
 
     
