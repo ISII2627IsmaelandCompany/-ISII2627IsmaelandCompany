@@ -1,0 +1,19 @@
+@startuml
+class Inscripcion {
+    + Id : int <<get>> <<set>>
+    + DatosPago : string <<get>> <<set>>
+    + PrecioTotal : decimal <<get>> <<set>>
+    + ApellidosUsuario : string <<get>> <<set>>
+    + DNI : string <<get>> <<set>>
+    + NombreUsuario : string <<get>> <<set>>
+    + Telefono : string <<get>> <<set>>
+    + Inscripcion()
+}
+class "IList`1"<T> {
+}
+Inscripcion --> "Cliente" ApplicationUser
+Inscripcion o-> "ClasesInscritas<ClaseInscrita>" "IList`1"
+Inscripcion --> "FechaInscripcion" DateTime
+Inscripcion --> "MetodoPago" MetodoPago
+Inscripcion --> "CompeticionInscripcion" CompeticionInscripcion
+@enduml

@@ -1,0 +1,6 @@
+!include ApplicationUser.puml
+!include TipoDeporte.puml
+!include ClaseDeportiva.puml
+!include ClaseInscrita.puml
+!include Inscripcion.puml
+!include MetodoPago.puml

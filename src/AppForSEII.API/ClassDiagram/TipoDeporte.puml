@@ -1,0 +1,15 @@
+@startuml
+class TipoDeporte {
+    + Id : int <<get>> <<set>>
+    + IdPista : int <<get>> <<set>>
+    + Nombre : string <<get>> <<set>>
+    + NombreTipoDeporte : string <<get>> <<set>>
+    + Descripcion : string? <<get>> <<set>>
+}
+class "List`1"<T> {
+}
+TipoDeporte o-> "Pistas<Pista>" "List`1"
+TipoDeporte o-> "Competiciones<Competicion>" "List`1"
+TipoDeporte o-> "Materiales<Material>" "List`1"
+TipoDeporte o-> "ClasesDeportivas<ClaseDeportiva>" "List`1"
+@enduml
