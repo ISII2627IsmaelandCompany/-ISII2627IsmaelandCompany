@@ -1,12 +1,11 @@
 //Para organizar donde esta el codigo
 namespace AppForSEII.API.Models
 {
-    
+
 public class ClaseInscrita
 {
        //atributos
-
-        [Key]//Primary key
+    [Key]
     public int Id { get; set; }
 
     public ClaseDeportiva ClaseDeportiva { get; set; }= null!;//no sera nulo
