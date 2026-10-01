@@ -2,6 +2,8 @@
 class Inscripcion {
     + Id : int <<get>> <<set>>
     + DatosPago : string <<get>> <<set>>
+    + FechaInscripcion : DateTime <<get>> <<set>>
+    + MetodoPago : MetodoPago <<get>> <<set>>
     + PrecioTotal : decimal <<get>> <<set>>
     + ApellidosUsuario : string <<get>> <<set>>
     + DNI : string <<get>> <<set>>
@@ -9,11 +11,8 @@ class Inscripcion {
     + Telefono : string <<get>> <<set>>
     + Inscripcion()
 }
-class "IList`1"<T> {
-}
+
 Inscripcion --> "Cliente" ApplicationUser
-Inscripcion o-> "ClasesInscritas<ClaseInscrita>" "IList`1"
-Inscripcion --> "FechaInscripcion" DateTime
-Inscripcion --> "MetodoPago" MetodoPago
-Inscripcion --> "CompeticionInscripcion" CompeticionInscripcion
+Inscripcion o-- "0..* ClasesInscritas" ClaseInscrita
+
 @enduml

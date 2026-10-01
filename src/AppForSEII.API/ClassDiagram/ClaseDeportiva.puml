@@ -3,6 +3,7 @@ class ClaseDeportiva {
     + Id : int <<get>> <<set>>
     + TipoDeporteId : int <<get>> <<set>>
     + Descripcion : string <<get>> <<set>>
+    + FechaHora : DateTime <<get>> <<set>>
     + Lugar : string? <<get>> <<set>>
     + Monitor : string <<get>> <<set>>
     + Nivel : string <<get>> <<set>>
@@ -10,10 +11,8 @@ class ClaseDeportiva {
     + PrecioUnitario : decimal <<get>> <<set>>
     + ClaseDeportiva()
     + ClaseDeportiva(descripcion:string, fechaHora:DateTime, lugar:string?, monitor:string, nivel:string, plazasDisponibles:int, precioUnitario:decimal)
+    + ClaseDeportiva(descripcion:string, tipoDeporte:TipoDeporte, fechaHora:DateTime, lugar:string?, monitor:string, nivel:string, plazasDisponibles:int, precioUnitario:decimal)
 }
-class "IList`1"<T> {
-}
-ClaseDeportiva o-> "TipoDeporte" TipoDeporte
-ClaseDeportiva o-> "ClasesInscritas<ClaseInscrita>" "IList`1"
-ClaseDeportiva --> "FechaHora" DateTime
+ClaseDeportiva o-- "0..* ClasesInscritas" ClaseInscrita
+ClaseDeportiva --> "TipoDeporte" TipoDeporte
 @enduml

@@ -1,6 +1,5 @@
 @startuml
 class ClaseInscrita {
-    + Id : int <<get>> <<set>>
     + ClaseDeportivaId : int <<get>> <<set>>
     + InscripcionId : int <<get>> <<set>>
     + Observaciones : string? <<get>> <<set>>
