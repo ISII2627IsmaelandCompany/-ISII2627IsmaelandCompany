@@ -1,11 +1,11 @@
 //Para organizar donde esta el codigo
 namespace AppForSEII.API.Models
 {
+[PrimaryKey(nameof(ClaseDeportivaId), nameof(InscripcionId))]//PK compuesta como en el ejemplo de purchase-PURCHASEITEM-MOVIE
 
 public class ClaseInscrita
 {
        //atributos
-    [Key]
     public int Id { get; set; }
 
     public ClaseDeportiva ClaseDeportiva { get; set; }= null!;//no sera nulo
