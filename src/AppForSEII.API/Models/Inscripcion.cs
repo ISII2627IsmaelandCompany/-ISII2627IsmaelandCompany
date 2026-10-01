@@ -2,11 +2,27 @@ namespace AppForSEII.API.Models
 {   
    public class Inscripcion
 {
+
+    public Inscripcion()
+        {
+        }   
+    public Inscripcion(ApplicationUser cliente, string datosPago, DateTime fechaInscripcion, MetodoPago metodoPago, decimal precioTotal, string apellidosUsuario, string dNI, string nombreUsuario, string telefono)
+    {
+        Cliente = cliente;
+        DatosPago = datosPago;
+        FechaInscripcion = fechaInscripcion;
+        MetodoPago = metodoPago;
+        PrecioTotal = precioTotal;
+        ApellidosUsuario = apellidosUsuario;
+        DNI = dNI;
+        NombreUsuario = nombreUsuario;
+        Telefono = telefono;
+    }
     //atributos
     
-        [Key]//PK
-        public int Id { get; set; }
-        public ApplicationUser Cliente { get; set; } // Relación N a 1 con ApplicationUser
+    [Key]//PK
+    public int Id { get; set; }
+    public ApplicationUser Cliente { get; set; } // Relación N a 1 con ApplicationUser
 
     public IList<ClaseInscrita> ClasesInscritas { get; set; }= new List<ClaseInscrita>();//Relación 1 a N con ClaseInscrita
      [Required]//obligatorio
@@ -33,7 +49,7 @@ namespace AppForSEII.API.Models
     public string ApellidosUsuario { get; set; } = string.Empty;
     
     [Required]
-    [Range(10000000, 99999999, ErrorMessage = "El DNI debe tener 8 dígitos")]
+    [StringLength(9, MinimumLength = 9, ErrorMessage = "El DNI debe tener 8 números y una letra")]
     public string DNI { get; set; } = string.Empty;
     
     [Required]
@@ -44,12 +60,9 @@ namespace AppForSEII.API.Models
     [Range(600000000, 799999999, ErrorMessage = "El teléfono debe tener 9 dígitos y empezar por 6 o 7")]
     public string Telefono { get; set; } = string.Empty;
 
-    public CompeticionInscripcion? CompeticionInscripcion { get; set; } // Relación con CompeticionInscripcion, dada su cardinalidad de 1 a 0 o muchos.
-
+    public List<CompeticionInscripcion> CompeticionInscripciones { get; set; } = new();
     //constructores
-    public Inscripcion()
-        {
-        }   
+    
 }
     
 }
