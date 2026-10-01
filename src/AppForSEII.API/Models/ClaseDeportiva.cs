@@ -52,7 +52,7 @@ public class ClaseDeportiva
     {
         
     }
-
+    //constructor con parametros antiguo
     public ClaseDeportiva( string descripcion, DateTime fechaHora, string? lugar, string monitor, string nivel, int plazasDisponibles, decimal precioUnitario)
     {
         
@@ -63,5 +63,17 @@ public class ClaseDeportiva
         this.Nivel = nivel;
         this.PlazasDisponibles = plazasDisponibles;
         this.PrecioUnitario = precioUnitario;
+    }
+    //constructor similar a movie al de  github
+    public ClaseDeportiva(string descripcion,TipoDeporte tipoDeporte,DateTime fechaHora,string? lugar,string monitor,string nivel,int plazasDisponibles,decimal precioUnitario)
+    {
+    this.Descripcion = descripcion;
+    this.TipoDeporte = tipoDeporte;
+    this.FechaHora = fechaHora;
+    this.Lugar = lugar;
+    this.Monitor = monitor;
+    this.Nivel = nivel;
+    this.PlazasDisponibles = plazasDisponibles;
+    this.PrecioUnitario = precioUnitario;
     }
 }
