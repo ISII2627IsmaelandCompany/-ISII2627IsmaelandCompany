@@ -26,6 +26,25 @@ public class Pista
 
 
     public TipoDeporte TipoDeporte { get; set; } = null!; //el null! es para mas adelante para la hora de hacer la relacion entre las clases
+    public int TipoDeporteId { get; set; }// FK que relaciona ClaseDeportiva con TipoDeporte de  1 a N
+
+    //Relacion con PistaReservada
+    public IList<PistaReservada> PistasReservadas { get; set; } = new List<PistaReservada>();//Relacion 1--N con PistaReservada. igual que el ejemplo de movie
+
+
+    //CONSTRUCTORES
+    public Pista()
+    {
+        
+    }
+
+    public Pista(string nombrePista, double precio, int nPersonas, int stock)
+    {
+        this.NombrePista = nombrePista;
+        this.Precio = precio;
+        this.NPersonas = nPersonas;
+        this.Stock = stock;
+    }
 
 }
  
