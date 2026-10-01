@@ -14,14 +14,22 @@ namespace AppForSEII.API.Data {
             var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             try {
                 SeedUsers(userManager, rolesNames);
+              
+                
             }
             catch (Exception ex) {
                 logger.LogError(ex, "An error occurred seeding the Users in the Database.");
             }
-
- 
-
+            try {
+            // Inicializa la base de datos con tipos de deporte y clases deportivas del CU4
+            SeedTiposDeporteAndClasesDeportivas(dbContext);
+            }
+            catch (Exception ex) {
+            logger.LogError(ex, "An error occurred seeding TipoDeporte and ClaseDeportiva in the Database.");
+            }
+            
         }
+        
 
         public static void SeedRoles(RoleManager<IdentityRole> roleManager, List<string> roles) {
 
@@ -36,6 +44,49 @@ namespace AppForSEII.API.Data {
             }
 
         }
+
+        //funcion como el de seedgenresandmovies añadiendo ejemplos para la base de  datos del  CU4
+        public static void SeedTiposDeporteAndClasesDeportivas(ApplicationDbContext dbcontext)
+    {
+        string[] tiposDeporteNombres =["Baloncesto","Futbol","Tenis"];
+
+        List<TipoDeporte> tiposDeporte = [];
+
+    foreach (string tipoDeporteNombre in tiposDeporteNombres)
+    {
+        var tipoDeporte = dbcontext.TipoDeportes.FirstOrDefault(t => t.Nombre == tipoDeporteNombre);
+
+        if (tipoDeporte == null)
+            tiposDeporte.Add(new TipoDeporte(tipoDeporteNombre));
+        else
+            tiposDeporte.Add(tipoDeporte);
+    }
+
+    if (dbcontext.ClasesDeportivas.FirstOrDefault(
+        c => c.Descripcion == "Entrenamiento de baloncesto") == null)
+    {
+        var claseDeportiva = new ClaseDeportiva("Entrenamiento de baloncesto",tiposDeporte[0],new DateTime(2026, 10, 5, 18, 0, 0),"Pista 1","Carlos","Iniciacion",20,8.00m);
+
+        dbcontext.ClasesDeportivas.Add(claseDeportiva);
+    }
+
+    if (dbcontext.ClasesDeportivas.FirstOrDefault(c => c.Descripcion == "Entrenamiento de futbol") == null)
+    {
+        var claseDeportiva = new ClaseDeportiva("Entrenamiento de futbol",tiposDeporte[1],new DateTime(2026, 10, 6, 19, 0, 0),"Pista 2","Laura","Intermedio",15,10.00m);
+
+        dbcontext.ClasesDeportivas.Add(claseDeportiva);
+    }
+
+    if (dbcontext.ClasesDeportivas.FirstOrDefault(
+        c => c.Descripcion == "Clase de tenis") == null)
+    {
+        var claseDeportiva = new ClaseDeportiva("Clase de tenis",tiposDeporte[2],new DateTime(2026, 10, 7, 17, 30, 0),null,"Miguel","Avanzado",10,12.50m);
+
+        dbcontext.ClasesDeportivas.Add(claseDeportiva);
+    }
+    //guarda  las modificaciones de dbcontext en database
+    dbcontext.SaveChanges();
+}
 
         public static void SeedUsers(UserManager<ApplicationUser> userManager, List<string> roles) {
             //first, it checks the user does not already exist in the DB
