@@ -22,7 +22,7 @@ namespace AppForSEII.API.Models
 
         [Required(ErrorMessage = "La descripción es obligatoria.")]
         [StringLength(250, MinimumLength = 10, ErrorMessage = "La descripción debe tener entre 10 y 250 caracteres.")]
-        public string Descripcion { get; set; }
+        public string Descripcion { get; set; }= string.Empty;
 
         [Required(ErrorMessage = "El ID del material es obligatorio.")]
         [Range(1, int.MaxValue, ErrorMessage = "El ID del material debe ser válido.")]
@@ -36,7 +36,7 @@ namespace AppForSEII.API.Models
         [Range(0.5, float.MaxValue, ErrorMessage = "El precio mínimo es 0.5 ")]
         public decimal Precio { get; set; }
 
-        public Alquiler Alquiler { get; set; }
-        public Material Material { get; set; }
+        public Alquiler Alquiler { get; set; }= null!;
+        public Material Material { get; set; }= null!;
     }
 }
