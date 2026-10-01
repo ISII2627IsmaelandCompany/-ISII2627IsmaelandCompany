@@ -31,6 +31,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Material> Materials { get; set; }
     public DbSet<PistaReservada> PistaReservada { get; set; }
     public DbSet<Alquiler> Alquileres { get; set; }
+    
+    public DbSet<MaterialAlquilado> MaterialAlquilados { get; set; }
 
 
 }
