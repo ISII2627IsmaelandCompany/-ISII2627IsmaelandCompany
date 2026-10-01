@@ -1,24 +1,12 @@
 namespace AppForSEII.API.Models
 {
+  [PrimaryKey(nameof(IdPista), nameof(IdReserva))]//PK compuesta como en el ejemplo de purchase-PURCHASEITEM-MOVIE
+
 public class PistaReservada
 {
-
-
-    
-    [Key]
-    public int Id {get; set;}
-    [Required]
-
-    public int IdPista { get; set; }//  Foreign key
-    [Required]
-
-    public int IdReserva{get; set;} //foreing key 
-
-
     [Required]
     [Range(1, 30, ErrorMessage = "La cantidad debe estar entre 1 y 30.")]
     public int Cantidad { get; set; }
-
 
 
     [Required]
@@ -34,13 +22,28 @@ public class PistaReservada
     public double Precio {get; set;}
 
 
-
-
-
-
-    public Pista? Pista {get; set;} = null! ; //la relacion con la clase pista. le pongo la interrogacion porue supongo que una pista puede tener pistas que no estan reservadas
+    public Pista Pista {get; set;} = null!; //la relacion con la clase pista.
     public Reserva Reserva {get; set;} = null! ; //relacion con la clase reserva, una reserva puede tener mucha pistasReservadas
 
-    
+    [Required]
+    public int IdPista { get; set; }//  Foreign key
+    [Required]
+
+    public int IdReserva{get; set;} //foreing key 
+
+
+    //CONSTRUCTORES
+    public PistaReservada()
+    {
+        
+    }
+    public PistaReservada(Pista pista, int cantidad, double precio)
+    {
+        Pista = pista;
+        IdPista = Pista.IdPista;
+        IdReserva = Reserva.Id;
+        this.Cantidad = cantidad;
+        this.Precio = precio;
+    }   
 }
 }
