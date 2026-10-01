@@ -6,7 +6,7 @@ namespace AppForSEII.API.Models
 public class ClaseInscrita
 {
        //atributos
-    public int Id { get; set; }
+   
 
     public ClaseDeportiva ClaseDeportiva { get; set; }= null!;//no sera nulo
     public Inscripcion Inscripcion{get;set;}= null!;//no sera nulo 
