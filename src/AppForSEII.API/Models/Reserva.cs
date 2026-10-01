@@ -9,6 +9,7 @@ public class Reserva
     
     public  IList<PistaReservada> PistasReservadas {get; set;}= new List<PistaReservada>();//Relación 1 a N con PistaReservada
 
+
    [Required]//obligatorio
     public MetodoPago MetodoPago { get; set; }//enum con   Bizum, Efectivo,Tarjeta,Transferencia,Metalico
 
@@ -35,9 +36,21 @@ public class Reserva
     [Range(10000000, 99999999, ErrorMessage = "El DNI debe tener 8 dígitos")]
     public string DNI { get; set; } = string.Empty;
 
+    
+
+
     //constructores 
     public Reserva()
     {
+    }
+    public Reserva(MetodoPago metodoPago, DateTime fechaReserva, decimal precioTotal, string apellidos, string nombreCliente, string dNI)
+    {
+        MetodoPago = metodoPago;
+        FechaReserva = fechaReserva;
+        PrecioTotal = precioTotal;
+        Apellidos = apellidos;
+        NombreCliente = nombreCliente;
+        DNI = dNI;
     }
 }
 }
