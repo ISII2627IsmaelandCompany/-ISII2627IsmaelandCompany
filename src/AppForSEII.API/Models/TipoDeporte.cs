@@ -34,5 +34,14 @@ public class TipoDeporte
 
     //relacion con ClaseDeportiva  
     public List<ClaseDeportiva> ClasesDeportivas { get; set; } = new List<ClaseDeportiva>(); //relacion TipoDeporte 1 ---- N ClaseDeportiva
+    //constructores 
+    public TipoDeporte()
+        {
+            
+        } 
+        //constructor como el de genre del ejemplo github
+    public TipoDeporte(string nombre) {
+         this.Nombre = nombre; 
+        }
 }
 }
