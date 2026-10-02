@@ -1,0 +1,11 @@
+@startuml
+
+class Reserva {
+    + Id : int <<get>> <<set>>
+    + MetodoPago : MetodoPago <<get>> <<set>>
+    + FechaReserva : DateTime <<get>> <<set>>
+    + PrecioTotal : decimal <<get>> <<set>>
+    + Reserva()
+}
+Reserva o-- "0..* PistasReservadas" PistaReservada
+@enduml
