@@ -6,17 +6,14 @@ namespace AppForSEII.API.Models
     public Inscripcion()
         {
         }   
-    public Inscripcion(ApplicationUser cliente, string datosPago, DateTime fechaInscripcion, MetodoPago metodoPago, decimal precioTotal, string apellidosUsuario, string dNI, string nombreUsuario, string telefono)
+    public Inscripcion(ApplicationUser cliente, string datosPago, DateTime fechaInscripcion, MetodoPago metodoPago, decimal precioTotal)
     {
         Cliente = cliente;
         DatosPago = datosPago;
         FechaInscripcion = fechaInscripcion;
         MetodoPago = metodoPago;
         PrecioTotal = precioTotal;
-        ApellidosUsuario = apellidosUsuario;
-        DNI = dNI;
-        NombreUsuario = nombreUsuario;
-        Telefono = telefono;
+    
     }
     //atributos
     
@@ -45,20 +42,6 @@ namespace AppForSEII.API.Models
     public decimal PrecioTotal { get; set; }
 
     //atributos CU 3
-    [Required]
-    public string ApellidosUsuario { get; set; } = string.Empty;
-    
-    [Required]
-    [StringLength(9, MinimumLength = 9, ErrorMessage = "El DNI debe tener 8 números y una letra")]
-    public string DNI { get; set; } = string.Empty;
-    
-    [Required]
-    [StringLength(50, ErrorMessage = "El nombre no puede tener más de 50 caracteres")]
-    public string NombreUsuario { get; set; } = string.Empty;
-    
-    [Required]
-    [Range(600000000, 799999999, ErrorMessage = "El teléfono debe tener 9 dígitos y empezar por 6 o 7")]
-    public string Telefono { get; set; } = string.Empty;
 
     public List<CompeticionInscripcion> CompeticionInscripciones { get; set; } = new();
     //constructores
