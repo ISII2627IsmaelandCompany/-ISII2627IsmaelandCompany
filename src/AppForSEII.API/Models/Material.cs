@@ -36,7 +36,7 @@ namespace AppForSEII.API.Models
         public int TipoDeporteId { get; set; }// FK que relaciona ClaseDeportiva con TipoDeporte de  1 a N
 
         public TipoMaterial TipoMaterial { get; set; } = null!;
-        public int IDTipoMaterial { get; set; }// FK que relaciona ClaseDeportiva con TipoMaterial de  1 a N
+        public int TipoMaterialId { get; set; }// FK que relaciona ClaseDeportiva con TipoMaterial de  1 a N
 
 
         public List<MaterialAlquilado> MaterialesAlquilados {get; set;} = new List<MaterialAlquilado>();

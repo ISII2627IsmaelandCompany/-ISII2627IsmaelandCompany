@@ -301,7 +301,7 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
             TipoDeporteId = tiposDeporte[0].Id,
 
             TipoMaterial = tipoBalones,
-            IDTipoMaterial = tipoBalones.IdTipoMaterial
+            TipoMaterialId = tipoBalones.IdTipoMaterial
         };
 
         dbcontext.Materials.Add(material);
@@ -322,7 +322,7 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
             TipoDeporteId = tiposDeporte[1].Id,
 
             TipoMaterial = tipoBalones,
-            IDTipoMaterial = tipoBalones.IdTipoMaterial
+            TipoMaterialId = tipoBalones.IdTipoMaterial
         };
 
         dbcontext.Materials.Add(material);
@@ -343,7 +343,7 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
             TipoDeporteId = tiposDeporte[2].Id,
 
             TipoMaterial = tipoRaquetas,
-            IDTipoMaterial = tipoRaquetas.IdTipoMaterial
+            TipoMaterialId = tipoRaquetas.IdTipoMaterial
         };
 
         dbcontext.Materials.Add(material);
