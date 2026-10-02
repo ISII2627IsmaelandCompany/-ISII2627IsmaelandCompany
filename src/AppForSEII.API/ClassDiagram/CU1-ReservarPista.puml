@@ -1,0 +1,11 @@
+@startuml
+
+!include .\ClaseDeportiva.puml
+!include .\Competicion.puml
+!include .\Reserva.puml
+!include .\Material.puml
+!include .\Pista.puml
+!include .\PistaReservada.puml
+!include .\TipoDeporte.puml
+
+@enduml

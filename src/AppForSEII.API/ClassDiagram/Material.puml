@@ -1,0 +1,10 @@
+@startuml
+class Material {
+    + Material()
+    + Material(cantidad:int, idMaterial:int, nombre:string, precio:decimal)
+    + IdMaterial : int <<get>> <<set>>
+    + Nombre : string <<get>> <<set>>
+    + Precio : decimal <<get>> <<set>>
+    + Cantidad : int <<get>> <<set>>
+}
+@enduml
