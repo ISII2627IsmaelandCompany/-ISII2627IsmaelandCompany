@@ -27,6 +27,13 @@ namespace AppForSEII.API.Data {
             catch (Exception ex) {
             logger.LogError(ex, "An error occurred seeding TipoDeporte and ClaseDeportiva in the Database.");
             }
+            try {//************
+            // Inicializa la base de datos con tipos de deporte y clases deportivas del CU4
+            SeedTiposDeporteAndPistas(dbContext);
+            }
+            catch (Exception ex) {
+            logger.LogError(ex, "An error occurred seeding TipoDeporte and Pista in the Database.");
+            }
             
         }
         
@@ -87,6 +94,57 @@ namespace AppForSEII.API.Data {
     //guarda  las modificaciones de dbcontext en database
     dbcontext.SaveChanges();
 }
+//***********************************************
+public static void SeedTiposDeporteAndPistas(ApplicationDbContext dbcontext)
+{
+    string[] tiposDeporteNombres= ["Baloncesto", "Futbol", "Tenis"];
+
+    List<TipoDeporte> tiposDeporte =[];
+
+    foreach (string tipoDeporteNombre in tiposDeporteNombres)
+    {
+        var tipoDeporte = dbcontext.TipoDeportes
+            .FirstOrDefault(t => t.Nombre == tipoDeporteNombre);
+
+        if (tipoDeporte== null)
+            tiposDeporte.Add(new TipoDeporte(tipoDeporteNombre));
+        else
+            tiposDeporte.Add(tipoDeporte);
+    }
+
+    if (dbcontext.Pistas.FirstOrDefault(
+        p => p.NombrePista == "Pista de baloncesto") ==null)
+    {
+        var pista= new Pista("Pista de baloncesto",12.00,20,1);
+
+        pista.TipoDeporte= tiposDeporte[0];
+
+        dbcontext.Pistas.Add(pista);
+    }
+
+    if (dbcontext.Pistas.FirstOrDefault(
+        p => p.NombrePista== "Pista de futbol") == null)
+    {
+        var pista =new Pista("Pista de futbol",15.00,22,1);
+
+        pista.TipoDeporte = tiposDeporte[1];
+
+        dbcontext.Pistas.Add(pista);
+    }
+
+    if (dbcontext.Pistas.FirstOrDefault(
+        p => p.NombrePista == "Pista de tenis") == null)
+    {
+        var pista= new Pista("Pista de tenis",10.00,4,1);
+
+        pista.TipoDeporte =tiposDeporte[2];
+
+        dbcontext.Pistas.Add(pista);
+    }
+
+    dbcontext.SaveChanges();
+}
+//************************************
 
         public static void SeedUsers(UserManager<ApplicationUser> userManager, List<string> roles) {
             //first, it checks the user does not already exist in the DB
