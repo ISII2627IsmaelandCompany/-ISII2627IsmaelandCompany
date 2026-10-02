@@ -23,12 +23,16 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Reserva> Reservas { get; set; }
     public DbSet<TipoMaterial> TipoMaterials { get; set; }
     public DbSet<Inscripcion> Inscripciones { get; set; }
+    public DbSet<CompeticionInscripcion> CompeticionInscripciones { get; set; }
+
     public DbSet<TipoDeporte> TipoDeportes{get;set;} 
     public DbSet<Pista> Pistas { get; set; }
     public DbSet<Competicion> Competiciones{get;set;}
     public DbSet<Material> Materials { get; set; }
     public DbSet<PistaReservada> PistaReservada { get; set; }
     public DbSet<Alquiler> Alquileres { get; set; }
+    
+    public DbSet<MaterialAlquilado> MaterialAlquilados { get; set; }
 
 
 }

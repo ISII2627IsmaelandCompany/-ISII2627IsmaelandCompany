@@ -2,11 +2,24 @@ namespace AppForSEII.API.Models
 {   
    public class Inscripcion
 {
+
+    public Inscripcion()
+        {
+        }   
+    public Inscripcion(ApplicationUser cliente, string datosPago, DateTime fechaInscripcion, MetodoPago metodoPago, decimal precioTotal)
+    {
+        Cliente = cliente;
+        DatosPago = datosPago;
+        FechaInscripcion = fechaInscripcion;
+        MetodoPago = metodoPago;
+        PrecioTotal = precioTotal;
+    
+    }
     //atributos
     
-        [Key]//PK
-        public int Id { get; set; }
-        public ApplicationUser Cliente { get; set; } // Relación N a 1 con ApplicationUser
+    [Key]//PK
+    public int Id { get; set; }
+    public ApplicationUser Cliente { get; set; } // Relación N a 1 con ApplicationUser
 
     public IList<ClaseInscrita> ClasesInscritas { get; set; }= new List<ClaseInscrita>();//Relación 1 a N con ClaseInscrita
      [Required]//obligatorio
@@ -29,27 +42,10 @@ namespace AppForSEII.API.Models
     public decimal PrecioTotal { get; set; }
 
     //atributos CU 3
-    [Required]
-    public string ApellidosUsuario { get; set; } = string.Empty;
-    
-    [Required]
-    [Range(10000000, 99999999, ErrorMessage = "El DNI debe tener 8 dígitos")]
-    public string DNI { get; set; } = string.Empty;
-    
-    [Required]
-    [StringLength(50, ErrorMessage = "El nombre no puede tener más de 50 caracteres")]
-    public string NombreUsuario { get; set; } = string.Empty;
-    
-    [Required]
-    [Range(600000000, 799999999, ErrorMessage = "El teléfono debe tener 9 dígitos y empezar por 6 o 7")]
-    public string Telefono { get; set; } = string.Empty;
 
-    public CompeticionInscripcion? CompeticionInscripcion { get; set; } // Relación con CompeticionInscripcion, dada su cardinalidad de 1 a 0 o muchos.
-
+    public List<CompeticionInscripcion> CompeticionInscripciones { get; set; } = new();
     //constructores
-    public Inscripcion()
-        {
-        }   
+    
 }
     
 }

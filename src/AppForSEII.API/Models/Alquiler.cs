@@ -5,7 +5,7 @@ namespace AppForSEII.API.Models
         public Alquiler()
         {
         }
-        public Alquiler(String apellidoUsuario, String dni, DateTime fechaAlquiler, int idAlquiler, string[] materialesAlquilados, MetodoPago metodoPago, string nombreUsuario, int numeroTelefono, int precioTotal)
+        public Alquiler(String apellidoUsuario, String dni, DateTime fechaAlquiler, int idAlquiler, List<MaterialAlquilado> materialesAlquilados, MetodoPago metodoPago, string nombreUsuario, int numeroTelefono, int precioTotal)
         {
            ApellidoUsuario = apellidoUsuario;
            DNI = dni;
@@ -40,7 +40,7 @@ namespace AppForSEII.API.Models
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime FechaAlquiler { get; set; }
 
-        public string[] MaterialesAlquilados { get; set; }
+        public List<MaterialAlquilado> MaterialesAlquilados { get; set; } //cardinalidad 1 a muchos con MaterialAlquilado
 
         [Required(ErrorMessage = "El método de pago es obligatorio.")]
         [StringLength(15, ErrorMessage = "El método de pago no puede tener más de 15 caracteres.", MinimumLength = 3)]
