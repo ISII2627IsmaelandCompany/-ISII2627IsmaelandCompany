@@ -1,6 +1,20 @@
 public class Competicion
 {
 
+    public Competicion()
+    {
+    }
+    public Competicion(DateTime fecha, string lugar, string nombre, int plazas, decimal precio)
+    {
+        Fecha = fecha;
+        Lugar = lugar;
+        Nombre = nombre;
+        Plazas = plazas;
+        Precio = precio;
+        Fecha = DateTime.Now;
+
+    }
+
     [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
     [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
     public DateTime Fecha { get; set; } 
