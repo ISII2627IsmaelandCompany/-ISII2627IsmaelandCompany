@@ -4,5 +4,9 @@
 !include .\Pista.puml
 !include .\PistaReservada.puml
 !include .\Reserva.puml
+!include .\MetodoPago.puml
 
+hide ClaseDeportiva
+hide Competicion
+hide Material
 @enduml
