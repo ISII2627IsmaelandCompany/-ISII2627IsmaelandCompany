@@ -232,68 +232,123 @@ public static void SeedCompeticiones(ApplicationDbContext dbcontext)
 }
 public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext)
 {
+    // Tipos de deporte
     string[] tiposDeporteNombres = ["Baloncesto", "Futbol", "Tenis"];
+
     List<TipoDeporte> tiposDeporte = [];
 
     foreach (string tipoDeporteNombre in tiposDeporteNombres)
     {
-        var tipoDeporte = dbcontext.TipoDeportes.FirstOrDefault(t => t.Nombre == tipoDeporteNombre);
+        var tipoDeporte = dbcontext.TipoDeportes
+            .FirstOrDefault(t => t.Nombre == tipoDeporteNombre);
+
         if (tipoDeporte == null)
         {
             tipoDeporte = new TipoDeporte(tipoDeporteNombre);
             dbcontext.TipoDeportes.Add(tipoDeporte);
-            dbcontext.SaveChanges();
         }
+
         tiposDeporte.Add(tipoDeporte);
     }
 
-    // Creación de Tipos de Material
-    var tipoBalon = dbcontext.Set<TipoMaterial>().FirstOrDefault(tm => tm.NombreTipoMaterial == "Balones");
-    if (tipoBalon == null)
+
+    // Tipos de material
+    var tipoBalones = dbcontext.TipoMaterials
+        .FirstOrDefault(t => t.NombreTipoMaterial == "Balones");
+
+    if (tipoBalones == null)
     {
-        tipoBalon = new TipoMaterial(1, "Balones");
-        dbcontext.Set<TipoMaterial>().Add(tipoBalon);
+        tipoBalones = new TipoMaterial
+        {
+            NombreTipoMaterial = "Balones",
+            Materiales = new List<Material>()
+        };
+
+        dbcontext.TipoMaterials.Add(tipoBalones);
     }
 
-    var tipoRaqueta = dbcontext.Set<TipoMaterial>().FirstOrDefault(tm => tm.NombreTipoMaterial == "Raquetas");
-    if (tipoRaqueta == null)
+
+    var tipoRaquetas = dbcontext.TipoMaterials
+        .FirstOrDefault(t => t.NombreTipoMaterial == "Raquetas");
+
+    if (tipoRaquetas == null)
     {
-        tipoRaqueta = new TipoMaterial(2, "Raquetas");
-        dbcontext.Set<TipoMaterial>().Add(tipoRaqueta);
+        tipoRaquetas = new TipoMaterial
+        {
+            NombreTipoMaterial = "Raquetas",
+            Materiales = new List<Material>()
+        };
+
+        dbcontext.TipoMaterials.Add(tipoRaquetas);
     }
 
+
+    //Guardamos primero para que SQL Server genere los IDs
     dbcontext.SaveChanges();
 
-    // Creacion de Materiales para Alquiler
-    if (dbcontext.Set<Material>().FirstOrDefault(m => m.Nombre == "Balón de Baloncesto Fran") == null)
+
+    // Material de baloncesto
+    if (dbcontext.Materials.FirstOrDefault(
+        m => m.Nombre == "Balon de baloncesto") == null)
     {
-        var material = new Material(10, 1, "Balón de Baloncesto Fran", 5.00m)
+        var material = new Material
         {
+            Nombre = "Balon de baloncesto",
+            Precio = 3.00m,
+            Cantidad = 10,
+
             TipoDeporte = tiposDeporte[0],
-            TipoMaterial = tipoBalon
+            TipoDeporteId = tiposDeporte[0].Id,
+
+            TipoMaterial = tipoBalones,
+            IDTipoMaterial = tipoBalones.IdTipoMaterial
         };
-        dbcontext.Set<Material>().Add(material);
+
+        dbcontext.Materials.Add(material);
     }
 
-    if (dbcontext.Set<Material>().FirstOrDefault(m => m.Nombre == "Balon de Futbol Dani") == null)
+
+    // Material de futbol
+    if (dbcontext.Materials.FirstOrDefault(
+        m => m.Nombre == "Balon de futbol") == null)
     {
-        var material = new Material(15, 2, "Balon de Futbol Dani", 4.50m)
+        var material = new Material
         {
+            Nombre = "Balon de futbol",
+            Precio = 4.00m,
+            Cantidad = 12,
+
             TipoDeporte = tiposDeporte[1],
-            TipoMaterial = tipoBalon
+            TipoDeporteId = tiposDeporte[1].Id,
+
+            TipoMaterial = tipoBalones,
+            IDTipoMaterial = tipoBalones.IdTipoMaterial
         };
-        dbcontext.Set<Material>().Add(material);
+
+        dbcontext.Materials.Add(material);
     }
 
-    if (dbcontext.Set<Material>().FirstOrDefault(m => m.Nombre == "Raqueta de Tenis Ismael") == null)
+
+    // Material de tenis
+    if (dbcontext.Materials.FirstOrDefault(
+        m => m.Nombre == "Raqueta de tenis") == null)
     {
-        var material = new Material(8, 3, "Raqueta de Tenis Ismael", 8.00m)
+        var material = new Material
         {
+            Nombre = "Raqueta de tenis",
+            Precio = 5.00m,
+            Cantidad = 8,
+
             TipoDeporte = tiposDeporte[2],
-            TipoMaterial = tipoRaqueta
+            TipoDeporteId = tiposDeporte[2].Id,
+
+            TipoMaterial = tipoRaquetas,
+            IDTipoMaterial = tipoRaquetas.IdTipoMaterial
         };
-        dbcontext.Set<Material>().Add(material);
+
+        dbcontext.Materials.Add(material);
     }
+
 
     dbcontext.SaveChanges();
 }
