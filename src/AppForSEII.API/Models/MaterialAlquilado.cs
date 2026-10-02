@@ -34,6 +34,7 @@ namespace AppForSEII.API.Models
 
         [Required(ErrorMessage = "El precio es obligatorio.")]
         [Range(0.5, float.MaxValue, ErrorMessage = "El precio mínimo es 0.5 ")]
+        [Precision(5, 2)]
         public decimal Precio { get; set; }
 
         public Alquiler Alquiler { get; set; }= null!;
