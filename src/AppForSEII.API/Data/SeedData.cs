@@ -44,6 +44,16 @@ namespace AppForSEII.API.Data {
             {
             logger.LogError(ex, "An error occurred seeding Competicion in the Database.");
             }
+            try
+            {
+                // Inicializa material y materiales para alquiler
+                SeedTiposMaterialAndMateriales(dbContext);
+            }
+            catch (Exception ex)
+            {
+
+                logger.LogError(ex, "An error occurred seeding TipoMaterial and Material in the Database.");
+            }
             
         }
         
@@ -216,6 +226,73 @@ public static void SeedCompeticiones(ApplicationDbContext dbcontext)
         competicion.TipoDeporte = tiposDeporte[2];
 
         dbcontext.Set<Competicion>().Add(competicion);
+    }
+
+    dbcontext.SaveChanges();
+}
+public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext)
+{
+    string[] tiposDeporteNombres = ["Baloncesto", "Futbol", "Tenis"];
+    List<TipoDeporte> tiposDeporte = [];
+
+    foreach (string tipoDeporteNombre in tiposDeporteNombres)
+    {
+        var tipoDeporte = dbcontext.TipoDeportes.FirstOrDefault(t => t.Nombre == tipoDeporteNombre);
+        if (tipoDeporte == null)
+        {
+            tipoDeporte = new TipoDeporte(tipoDeporteNombre);
+            dbcontext.TipoDeportes.Add(tipoDeporte);
+            dbcontext.SaveChanges();
+        }
+        tiposDeporte.Add(tipoDeporte);
+    }
+
+    // Creación de Tipos de Material
+    var tipoBalon = dbcontext.Set<TipoMaterial>().FirstOrDefault(tm => tm.NombreTipoMaterial == "Balones");
+    if (tipoBalon == null)
+    {
+        tipoBalon = new TipoMaterial(1, "Balones");
+        dbcontext.Set<TipoMaterial>().Add(tipoBalon);
+    }
+
+    var tipoRaqueta = dbcontext.Set<TipoMaterial>().FirstOrDefault(tm => tm.NombreTipoMaterial == "Raquetas");
+    if (tipoRaqueta == null)
+    {
+        tipoRaqueta = new TipoMaterial(2, "Raquetas");
+        dbcontext.Set<TipoMaterial>().Add(tipoRaqueta);
+    }
+
+    dbcontext.SaveChanges();
+
+    // Creacion de Materiales para Alquiler
+    if (dbcontext.Set<Material>().FirstOrDefault(m => m.Nombre == "Balón de Baloncesto Fran") == null)
+    {
+        var material = new Material(10, 1, "Balón de Baloncesto Fran", 5.00m)
+        {
+            TipoDeporte = tiposDeporte[0],
+            TipoMaterial = tipoBalon
+        };
+        dbcontext.Set<Material>().Add(material);
+    }
+
+    if (dbcontext.Set<Material>().FirstOrDefault(m => m.Nombre == "Balon de Futbol Dani") == null)
+    {
+        var material = new Material(15, 2, "Balon de Futbol Dani", 4.50m)
+        {
+            TipoDeporte = tiposDeporte[1],
+            TipoMaterial = tipoBalon
+        };
+        dbcontext.Set<Material>().Add(material);
+    }
+
+    if (dbcontext.Set<Material>().FirstOrDefault(m => m.Nombre == "Raqueta de Tenis Ismael") == null)
+    {
+        var material = new Material(8, 3, "Raqueta de Tenis Ismael", 8.00m)
+        {
+            TipoDeporte = tiposDeporte[2],
+            TipoMaterial = tipoRaqueta
+        };
+        dbcontext.Set<Material>().Add(material);
     }
 
     dbcontext.SaveChanges();
