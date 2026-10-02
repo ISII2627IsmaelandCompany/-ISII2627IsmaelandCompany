@@ -25,16 +25,7 @@ public class Reserva
     [Range(0, 999.99,ErrorMessage = "El precio total no puede ser negativo y máximo 999.99")]//rango de precio
     public decimal PrecioTotal { get; set; }
 
-    [Required]
-    public string Apellidos { get; set; } = string.Empty;
 
-    [Required]
-    [StringLength(50, ErrorMessage = "El nombre no puede tener más de 50 caracteres")]
-    public string NombreCliente { get; set; } = string.Empty;   
-
-    [Required]
-    [Range(10000000, 99999999, ErrorMessage = "El DNI debe tener 8 dígitos")]
-    public string DNI { get; set; } = string.Empty;
 
     
 
@@ -43,14 +34,11 @@ public class Reserva
     public Reserva()
     {
     }
-    public Reserva(MetodoPago metodoPago, DateTime fechaReserva, decimal precioTotal, string apellidos, string nombreCliente, string dNI)
+    public Reserva(MetodoPago metodoPago, DateTime fechaReserva, decimal precioTotal)
     {
         MetodoPago = metodoPago;
         FechaReserva = fechaReserva;
         PrecioTotal = precioTotal;
-        Apellidos = apellidos;
-        NombreCliente = nombreCliente;
-        DNI = dNI;
     }
 }
 }

@@ -10,4 +10,6 @@ class TipoDeporte {
     + TipoDeporte(nombre:string)
 }
 TipoDeporte o-- "0..* Pistas" Pista
+
+TipoDeporte o-- "0..* ClasesDeportivas" ClaseDeportiva
 @enduml

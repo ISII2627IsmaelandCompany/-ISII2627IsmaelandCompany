@@ -1,0 +1,16 @@
+@startuml
+
+!include .\ApplicationUser.puml
+!include .\TipoDeporte.puml
+!include .\ClaseDeportiva.puml
+!include .\ClaseInscrita.puml
+!include .\Inscripcion.puml
+!include .\MetodoPago.puml
+
+hide CompeticionInscripcion
+hide Competicion
+hide Material
+hide Pista
+
+
+@enduml
