@@ -1,16 +1,11 @@
 @startuml
+
 class Reserva {
     + Id : int <<get>> <<set>>
+    + MetodoPago : MetodoPago <<get>> <<set>>
+    + FechaReserva : DateTime <<get>> <<set>>
     + PrecioTotal : decimal <<get>> <<set>>
-    + Apellidos : string <<get>> <<set>>
-    + NombreCliente : string <<get>> <<set>>
-    + DNI : string <<get>> <<set>>
     + Reserva()
-    + Reserva(metodoPago:MetodoPago, fechaReserva:DateTime, precioTotal:decimal, apellidos:string, nombreCliente:string, dNI:string)
 }
-class "IList`1"<T> {
-}
-Reserva o-> "PistasReservadas<PistaReservada>" "IList`1"
-Reserva --> "MetodoPago" MetodoPago
-Reserva --> "FechaReserva" DateTime
+Reserva o-- "0..* PistasReservadas" PistaReservada
 @enduml
