@@ -1,0 +1,13 @@
+@startuml
+class TipoDeporte {
+    + Id : int <<get>> <<set>>
+    + IdPista : int <<get>> <<set>>
+    + Nombre : string <<get>> <<set>>
+    + NombreTipoDeporte : string <<get>> <<set>>
+    + Descripcion : string? <<get>> <<set>>
+    + TipoDeporte()
+    + TipoDeporte(nombre:string)
+}
+
+TipoDeporte o-- "0..* ClasesDeportivas" ClaseDeportiva
+@enduml
