@@ -5,10 +5,6 @@ class Inscripcion {
     + FechaInscripcion : DateTime <<get>> <<set>>
     + MetodoPago : MetodoPago <<get>> <<set>>
     + PrecioTotal : decimal <<get>> <<set>>
-    + ApellidosUsuario : string <<get>> <<set>>
-    + DNI : string <<get>> <<set>>
-    + NombreUsuario : string <<get>> <<set>>
-    + Telefono : string <<get>> <<set>>
     + Inscripcion()
 }
 
