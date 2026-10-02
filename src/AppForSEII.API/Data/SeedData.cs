@@ -34,6 +34,16 @@ namespace AppForSEII.API.Data {
             catch (Exception ex) {
             logger.LogError(ex, "An error occurred seeding TipoDeporte and Pista in the Database.");
             }
+            try
+            {
+            // Inicializa la base de datos con competiciones
+            SeedCompeticiones(dbContext);
+    
+            }
+            catch (Exception ex)
+            {
+            logger.LogError(ex, "An error occurred seeding Competicion in the Database.");
+            }
             
         }
         
@@ -145,6 +155,71 @@ public static void SeedTiposDeporteAndPistas(ApplicationDbContext dbcontext)
     dbcontext.SaveChanges();
 }
 //************************************
+public static void SeedCompeticiones(ApplicationDbContext dbcontext)
+{
+    string[] tiposDeporteNombres = ["Baloncesto", "Futbol", "Tenis"];
+
+    List<TipoDeporte> tiposDeporte = [];
+
+    foreach (string tipoDeporteNombre in tiposDeporteNombres)
+    {
+        var tipoDeporte = dbcontext.TipoDeportes
+            .FirstOrDefault(t => t.Nombre == tipoDeporteNombre);
+
+        if (tipoDeporte != null)
+            tiposDeporte.Add(tipoDeporte);
+    }
+
+    if (dbcontext.Set<Competicion>().FirstOrDefault(
+        c => c.Nombre == "Torneo de Baloncesto UCLM") == null)
+    {
+        var competicion = new Competicion(
+            new DateTime(2026, 11, 15),
+            "Pabellón Universitario",
+            "Torneo de Baloncesto UCLM",
+            20,
+            15.00m
+        );
+
+        competicion.TipoDeporte = tiposDeporte[0];
+
+        dbcontext.Set<Competicion>().Add(competicion);
+    }
+
+    if (dbcontext.Set<Competicion>().FirstOrDefault(
+        c => c.Nombre == "Torneo de Futbol UCLM") == null)
+    {
+        var competicion = new Competicion(
+            new DateTime(2026, 11, 22),
+            "Campo de Fútbol UCLM",
+            "Torneo de Futbol UCLM",
+            30,
+            12.50m
+        );
+
+        competicion.TipoDeporte = tiposDeporte[1];
+
+        dbcontext.Set<Competicion>().Add(competicion);
+    }
+
+    if (dbcontext.Set<Competicion>().FirstOrDefault(
+        c => c.Nombre == "Torneo de Tenis UCLM") == null)
+    {
+        var competicion = new Competicion(
+            new DateTime(2026, 12, 5),
+            "Pistas de Tenis UCLM",
+            "Torneo de Tenis UCLM",
+            16,
+            10.00m
+        );
+
+        competicion.TipoDeporte = tiposDeporte[2];
+
+        dbcontext.Set<Competicion>().Add(competicion);
+    }
+
+    dbcontext.SaveChanges();
+}
 
         public static void SeedUsers(UserManager<ApplicationUser> userManager, List<string> roles) {
             //first, it checks the user does not already exist in the DB
