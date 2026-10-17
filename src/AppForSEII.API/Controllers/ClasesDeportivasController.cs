@@ -33,7 +33,7 @@ public async Task<ActionResult> GetClasesDeportivasForInscripcion(string? tipoDe
 
         .OrderBy(c => c.FechaHora)//Ordenamos por fecha y hora
 
-        .Select(c => new ClaseDeportivaForInscripcionDTO(c.Id,c.Descripcion,c.TipoDeporte.Nombre,c.FechaHora,c.Nivel,c.Monitor,c.Lugar,c.PlazasDisponibles,c.PrecioUnitario))
+        .Select(c => new ClaseDeportivaForInscripcionDTO(c.Id,c.Descripcion,c.TipoDeporte.Nombre,c.FechaHora,c.Lugar,c.Monitor,c.Nivel,c.PlazasDisponibles,c.PrecioUnitario))
         //convertimos claseDeportiva de la base  de datos en  nuesto Dto, devolviendo datos  necesarios
         .ToListAsync();//convertimos resultado en  una lista
 

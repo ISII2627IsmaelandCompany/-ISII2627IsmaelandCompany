@@ -45,5 +45,28 @@ namespace AppForSEII.API.DTOs.ClaseDeportivaDTOs//namespace de  donde esta el dt
     [Range(0, 999.99)]
     public decimal PrecioUnitario { get; set; }//precio  clase
         
+        // override object.Equals
+        public override bool Equals(object? obj)
+        {//comprueba si el objeto es recibido es otro DTO del mismo tipo
+        //y si todas sus propiedades tienen el mismo valor si es asi devolvera true por lo contrario false
+
+         return obj is ClaseDeportivaForInscripcionDTO dTO &&
+            Id == dTO.Id &&
+           Descripcion == dTO.Descripcion &&
+           TipoDeporte == dTO.TipoDeporte &&
+           FechaHora == dTO.FechaHora &&
+           Lugar == dTO.Lugar &&
+           Monitor == dTO.Monitor &&
+           Nivel == dTO.Nivel &&
+           PlazasDisponibles == dTO.PlazasDisponibles &&
+           PrecioUnitario == dTO.PrecioUnitario;  
+            }
+        
+        public override int GetHashCode()//hascode come el de appformovie, lo que hace es generar un numero a partir de los atributos del objeto
+        {//para poder identificarlo y compararlo 
+            return HashCode.Combine(HashCode.Combine(Id, Descripcion, TipoDeporte, FechaHora, Lugar, Monitor,Nivel,PlazasDisponibles),PrecioUnitario);//se tiene que poner de esta forma porque tiene 9 atributos y por cada hashcode combine solo admite 8
+        }
+
     }
+
 }
