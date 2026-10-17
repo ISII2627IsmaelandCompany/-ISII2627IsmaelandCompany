@@ -111,6 +111,24 @@ namespace AppForSEII.API.Data {
 
         dbcontext.ClasesDeportivas.Add(claseDeportiva);
     }
+
+    // NUEVA clase sin plazas para probar que el GET no la devuelve
+    if (dbcontext.ClasesDeportivas.FirstOrDefault(
+        c => c.Descripcion == "Clase de tenis completa") == null)
+    {
+        var claseDeportiva = new ClaseDeportiva(
+            "Clase de tenis completa",
+            tiposDeporte[2],
+            new DateTime(2026, 10, 8, 18, 0, 0),
+            "Pista 3",
+            "Miguel",
+            "Intermedio",
+            0,
+            9.50m
+        );
+
+        dbcontext.ClasesDeportivas.Add(claseDeportiva);
+    }
     //guarda  las modificaciones de dbcontext en database
     dbcontext.SaveChanges();
 }
