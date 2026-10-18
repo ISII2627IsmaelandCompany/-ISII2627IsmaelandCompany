@@ -111,6 +111,24 @@ namespace AppForSEII.API.Data {
 
         dbcontext.ClasesDeportivas.Add(claseDeportiva);
     }
+
+    // NUEVA clase sin plazas para probar que el GET no la devuelve
+    if (dbcontext.ClasesDeportivas.FirstOrDefault(
+        c => c.Descripcion == "Clase de tenis completa") == null)
+    {
+        var claseDeportiva = new ClaseDeportiva(
+            "Clase de tenis completa",
+            tiposDeporte[2],
+            new DateTime(2026, 10, 8, 18, 0, 0),
+            "Pista 3",
+            "Miguel",
+            "Intermedio",
+            0,
+            9.50m
+        );
+
+        dbcontext.ClasesDeportivas.Add(claseDeportiva);
+    }
     //guarda  las modificaciones de dbcontext en database
     dbcontext.SaveChanges();
 }
@@ -232,9 +250,8 @@ public static void SeedCompeticiones(ApplicationDbContext dbcontext)
 }
 public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext)
 {
-    // Tipos de deporte
+    // Tipos de Deporte ejemplo
     string[] tiposDeporteNombres = ["Baloncesto", "Futbol", "Tenis"];
-
     List<TipoDeporte> tiposDeporte = [];
 
     foreach (string tipoDeporteNombre in tiposDeporteNombres)
@@ -251,8 +268,7 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
         tiposDeporte.Add(tipoDeporte);
     }
 
-
-    // Tipos de material
+    // Tipos de Material ejemplo
     var tipoBalones = dbcontext.TipoMaterials
         .FirstOrDefault(t => t.NombreTipoMaterial == "Balones");
 
@@ -263,10 +279,8 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
             NombreTipoMaterial = "Balones",
             Materiales = new List<Material>()
         };
-
         dbcontext.TipoMaterials.Add(tipoBalones);
     }
-
 
     var tipoRaquetas = dbcontext.TipoMaterials
         .FirstOrDefault(t => t.NombreTipoMaterial == "Raquetas");
@@ -278,81 +292,109 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
             NombreTipoMaterial = "Raquetas",
             Materiales = new List<Material>()
         };
-
         dbcontext.TipoMaterials.Add(tipoRaquetas);
     }
 
-
-    //Guardamos primero para que SQL Server genere los IDs
+    // Guardamos para SQL Server
     dbcontext.SaveChanges();
 
-
-    // Material de baloncesto
-    if (dbcontext.Materials.FirstOrDefault(
-        m => m.Nombre == "Balon de baloncesto") == null)
+    // Ejemplo de materiales para alquiler
+    var balonBaloncesto = dbcontext.Materials.FirstOrDefault(m => m.Nombre == "Balon de baloncesto");
+    if (balonBaloncesto == null)
     {
-        var material = new Material
+        balonBaloncesto = new Material
         {
             Nombre = "Balon de baloncesto",
             Precio = 3.00m,
             Cantidad = 10,
-
             TipoDeporte = tiposDeporte[0],
             TipoDeporteId = tiposDeporte[0].Id,
-
             TipoMaterial = tipoBalones,
             TipoMaterialId = tipoBalones.IdTipoMaterial
         };
-
-        dbcontext.Materials.Add(material);
+        dbcontext.Materials.Add(balonBaloncesto);
     }
 
-
-    // Material de futbol
-    if (dbcontext.Materials.FirstOrDefault(
-        m => m.Nombre == "Balon de futbol") == null)
+    var balonFutbol = dbcontext.Materials.FirstOrDefault(m => m.Nombre == "Balon de futbol");
+    if (balonFutbol == null)
     {
-        var material = new Material
+        balonFutbol = new Material
         {
             Nombre = "Balon de futbol",
             Precio = 4.00m,
             Cantidad = 12,
-
             TipoDeporte = tiposDeporte[1],
             TipoDeporteId = tiposDeporte[1].Id,
-
             TipoMaterial = tipoBalones,
             TipoMaterialId = tipoBalones.IdTipoMaterial
         };
-
-        dbcontext.Materials.Add(material);
+        dbcontext.Materials.Add(balonFutbol);
     }
 
-
-    // Material de tenis
-    if (dbcontext.Materials.FirstOrDefault(
-        m => m.Nombre == "Raqueta de tenis") == null)
+    var raquetaTenis = dbcontext.Materials.FirstOrDefault(m => m.Nombre == "Raqueta de tenis");
+    if (raquetaTenis == null)
     {
-        var material = new Material
+        raquetaTenis = new Material
         {
             Nombre = "Raqueta de tenis",
             Precio = 5.00m,
             Cantidad = 8,
-
             TipoDeporte = tiposDeporte[2],
             TipoDeporteId = tiposDeporte[2].Id,
-
             TipoMaterial = tipoRaquetas,
             TipoMaterialId = tipoRaquetas.IdTipoMaterial
         };
-
-        dbcontext.Materials.Add(material);
+        dbcontext.Materials.Add(raquetaTenis);
     }
 
-
+    // Guardamos para asegurar que los materiales tienen su IdMaterial generado
     dbcontext.SaveChanges();
-}
 
+    // Materiales alquilados ejemplo
+    if (!dbcontext.MaterialAlquilados.Any())
+    {
+        // Creamos la cabecera de Alquiler obligatoria (necesaria por la clave compuesta)
+        var alquilerPrueba = new Alquiler
+        {
+            FechaAlquiler = DateTime.Now,
+            MetodoPago = MetodoPago.Tarjeta, //Utilizamos la clase MetodoPago
+            PrecioTotal = 11 
+        };
+
+        dbcontext.Alquileres.Add(alquilerPrueba);
+        dbcontext.SaveChanges();
+
+        // Creamos los registros de MaterialAlquilado enlazados correctamente
+        var materialesAlquiladosPrueba = new List<MaterialAlquilado>
+        {
+            new MaterialAlquilado(
+                cantidad: 2,
+                descripcion: "Alquiler de balones para torneo escolar",
+                idMaterial: balonBaloncesto.IdMaterial,
+                idAlquiler: alquilerPrueba.IdAlquiler,
+                precio: balonBaloncesto.Precio
+            )
+            {
+                Material = balonBaloncesto,
+                Alquiler = alquilerPrueba
+            },
+            new MaterialAlquilado(
+                cantidad: 1,
+                descripcion: "Alquiler de raqueta para clase de tenis",
+                idMaterial: raquetaTenis.IdMaterial,
+                idAlquiler: alquilerPrueba.IdAlquiler,
+                precio: raquetaTenis.Precio
+            )
+            {
+                Material = raquetaTenis,
+                Alquiler = alquilerPrueba
+            }
+        };
+
+        dbcontext.MaterialAlquilados.AddRange(materialesAlquiladosPrueba);
+        dbcontext.SaveChanges();
+    }
+}
         public static void SeedUsers(UserManager<ApplicationUser> userManager, List<string> roles) {
             //first, it checks the user does not already exist in the DB
             if (userManager.FindByNameAsync("elena@uclm.es").Result == null) {
