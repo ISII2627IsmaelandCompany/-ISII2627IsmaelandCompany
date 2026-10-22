@@ -6,12 +6,12 @@ namespace AppForSEII.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class InscripcionesController : ControllerBase
+    public class InscripcionClasesDeportivasController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<InscripcionesController> _logger;
+        private readonly ILogger<InscripcionClasesDeportivasController> _logger;
 
-        public InscripcionesController(ApplicationDbContext context,ILogger<InscripcionesController> logger)
+        public InscripcionClasesDeportivasController(ApplicationDbContext context,ILogger<InscripcionClasesDeportivasController> logger)
         {
             _context = context;
             _logger = logger;
