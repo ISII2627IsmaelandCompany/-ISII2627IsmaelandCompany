@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using AppForSEII.API.DTOs.ClaseDeportivaDTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,9 @@ namespace AppForSEII.API.Controllers//sitio  donde esta el controlador
         [HttpGet]//peticiones HTTP Get
         [Route("[action]")]//la api usa nombre metodo: api/ClasesDeportivas/GetClasesDeportivasForInscripcion
 [ProducesResponseType(typeof(IList<ClaseDeportivaForInscripcionDTO>), (int)HttpStatusCode.OK)]//si todo va correcto devuelve lista de ClaseDeportivaForInscripcionDto
+[ProducesResponseType((int)HttpStatusCode.NotFound)]
 public async Task<ActionResult> GetClasesDeportivasForInscripcion(string? tipoDeporte,string? monitor,DateTime? fecha){ 
+
     IList<ClaseDeportivaForInscripcionDTO> clases = await _context.ClasesDeportivas//consultar  clase deportivas  de la base  de datos
 
         .Include(c => c.TipoDeporte)//carga informacion relaciona de tipodeporte para devolver su nombre
@@ -36,6 +39,10 @@ public async Task<ActionResult> GetClasesDeportivasForInscripcion(string? tipoDe
         .Select(c => new ClaseDeportivaForInscripcionDTO(c.Id,c.Descripcion,c.TipoDeporte.Nombre,c.FechaHora,c.Lugar,c.Monitor,c.Nivel,c.PlazasDisponibles,c.PrecioUnitario))
         //convertimos claseDeportiva de la base  de datos en  nuesto Dto, devolviendo datos  necesarios
         .ToListAsync();//convertimos resultado en  una lista
+        //flujo alternativo 0 si no hay plazas para lo que busca el cliente se notifica
+        if (clases.Count == 0){
+    return NotFound("No se han encontrado clases deportivas con plazas disponibles");}
+
 
     return Ok(clases);}
     }
