@@ -1,6 +1,8 @@
 using AppForSEII.API.Data;
 using AppForSEII.API.DTOs.InscripcionDTOs;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace AppForSEII.API.Controllers
@@ -20,7 +22,8 @@ namespace AppForSEII.API.Controllers
 
         [HttpGet]//acción para obtener las competiciones disponibles para la inscripción
         [Route("[action]")]//ruta de la acción
-        [ProducesResponseType(typeof(IList<CompeticionForInscripcionDTO>), (int)HttpStatusCode.OK)][ProducesResponseType(typeof(ValidationProblemDetails),(int)HttpStatusCode.BadRequest)]//tipos de respuesta que puede devolver la acción
+        [ProducesResponseType(typeof(IList<CompeticionForInscripcionDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]//tipos de respuesta que puede devolver la acción
         public async Task<ActionResult> GetCompeticionesForInscripcion(string? nombre, string? tipoDeporte, DateTime? fromDate, DateTime? toDate)//acción para obtener las competiciones disponibles para la inscripción, con filtros opcionales por nombre, tipo de deporte y rango de fechas
         {
             if (fromDate != null &&
@@ -36,6 +39,7 @@ namespace AppForSEII.API.Controllers
 
                 return BadRequest(new ValidationProblemDetails(ModelState));//devuelve un error 400 con los detalles del error si fromDate es posterior a toDate
             }
+            
 
             var competiciones = await _context.Competiciones//obtiene las competiciones que cumplen con los criterios de filtro
                 .Where(c =>
@@ -63,7 +67,60 @@ namespace AppForSEII.API.Controllers
                     c.Precio))
                 .ToListAsync();//convierte la lista de competiciones a una lista de DTOs para la inscripción
 
+
+            if(competiciones.Count == 0)//comprueba si no hay competiciones con plazas disponibles para la inscripción
+            {
+                ModelState.AddModelError(
+                    "Plazas",
+                    "No hay plazas disponibles para la competición");
+
+                _logger.LogError(
+                    $"{DateTime.Now} Error: No hay plazas disponibles para la competición");
+
+                return BadRequest(new ValidationProblemDetails(ModelState));//devuelve un error 400 con los detalles del error si no hay plazas disponibles para la competición
+            }
+            
             return Ok(competiciones);//devuelve un código 200 con la lista de competiciones disponibles para la inscripción
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(InscripcionDetailDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult> GetInscripcion(int id)
+        {
+            var inscripcion = await _context.Inscripciones
+                .Where(i => i.Id == id)
+                .Select(i => new InscripcionDetailDTO(
+                    i.Id,
+                    i.Cliente.Name,
+                    i.Cliente.Surname,
+                    i.Cliente.DNI,
+                    i.Cliente.Email,
+                    i.Cliente.PhoneNumber,
+                    i.FechaInscripcion,
+                    i.PrecioTotal,
+                    i.MetodoPago,
+                    i.CompeticionInscripciones
+                        .Select(ci => new InscripcionItemDTO(
+                            ci.Competicion.Nombre,
+                            ci.Competicion.Lugar,
+                            ci.Competicion.Fecha,
+                            ci.Competicion.Precio,
+                            ci.ProblemasFisicos
+                        ))
+                        .ToList()
+                ))
+                .FirstOrDefaultAsync();
+
+            if (inscripcion == null)
+            {
+                _logger.LogError($"Error: Inscripcion with id {id} does not exist");
+                return NotFound();
+            }
+
+            return Ok(inscripcion);
         }
     }
 }
+
