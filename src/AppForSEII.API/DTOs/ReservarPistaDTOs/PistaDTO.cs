@@ -4,23 +4,25 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 
-namespace AppForSEII.API.DTOs.ReservarPistaDTOs
+namespace AppForSEII.API.DTOs.PistaDTOs
 {
-    public class ReservarPistaDTO
+    public class PistaDTO
     {
-        public ReservarPistaDTO()
+        public PistaDTO()
         {
         }
 
-        public ReservarPistaDTO(int idPista, string nombrePista, int nPersonas, double precio, int stock)
+        public PistaDTO(int idPista, string nombrePista, int nPersonas, double precio, int stock, string tipoDeporte)
         {
             IdPista = idPista;
             NombrePista = nombrePista;
             NPersonas = nPersonas;
             Precio = precio;
             Stock = stock;
+            TipoDeporte = tipoDeporte; 
         }
 
         public int IdPista { get; set; }
@@ -43,20 +45,24 @@ namespace AppForSEII.API.DTOs.ReservarPistaDTOs
         [Required]
         [Range(0, 999.99, ErrorMessage = "El stock no puede ser negativo y máximo 999.99")]//rango de precio    
         public int Stock { get; set; }
-    
+        
+        [Required]
+        [StringLength(50, ErrorMessage = "El tipo de deporte no puede tener mas de 50 caracteres")]
+        public string TipoDeporte{ get; set; }= string.Empty; 
         public override bool Equals(object? obj)
         {
-            return obj is ReservarPistaDTO dTO &&
+            return obj is PistaDTO dTO &&
                    IdPista == dTO.IdPista &&
                    NombrePista == dTO.NombrePista &&
                    NPersonas == dTO.NPersonas &&
                    Precio == dTO.Precio &&
-                   Stock == dTO.Stock   ;
+                   Stock == dTO.Stock &&
+                   TipoDeporte == dTO.TipoDeporte;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(IdPista, NombrePista, NPersonas, Precio, Stock);
+            return HashCode.Combine(IdPista, NombrePista, NPersonas, Precio, Stock, TipoDeporte);
         }
     }
 }
