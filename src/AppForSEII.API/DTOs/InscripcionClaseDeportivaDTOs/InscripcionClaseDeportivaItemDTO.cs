@@ -1,7 +1,7 @@
 namespace AppForSEII.API.DTOs.InscripcionClaseDeportivaDTOs
 {//dto de una clase deportiva con el detalle de inscripcion
     public class InscripcionClaseDeportivaItemDTO
-    {
+    {                                             //añadimos  claseDeportivaId para cuando se hace  el post(al crear una inscripcion) tener claro a que ClaseDeportiva se refiere
         public InscripcionClaseDeportivaItemDTO(int claseDeportivaId,string descripcion, string tipoDeporte, DateTime fechaHora, int plazasReservadas, decimal precio, string? observaciones)
         {//constructor para crear un item por cada claseInscrita
         ClaseDeportivaId=claseDeportivaId;
@@ -12,7 +12,7 @@ namespace AppForSEII.API.DTOs.InscripcionClaseDeportivaDTOs
             Precio = precio;
             Observaciones = observaciones;
         }
-        public int ClaseDeportivaId { get; set; }
+        public int ClaseDeportivaId { get; set; }//id de  la clase deportiva de la base de datos
         [Required]//obligatorio
         public string Descripcion{get;set;}
         [Required]//obligatorio
