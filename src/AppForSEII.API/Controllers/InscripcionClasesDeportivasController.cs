@@ -54,6 +54,17 @@ if (inscripcionForCreate.ClasesInscritas.Count == 0)
     ModelState.AddModelError("ClasesInscritas", "Error, Debe incluir al menos una clase deportiva");
 }
 
+// comprobamos que no se haya seleccionado dos veces la misma clase deportiva
+if (inscripcionForCreate.ClasesInscritas
+    .GroupBy(ci => ci.ClaseDeportivaId)//agrupa los elemetos que tienen el mismo id de clase deportiva
+    .Any(grupo => grupo.Count() > 1))//comprueba si existe algun grupo que cumpla la condicion
+{
+    // si hay una clase repetida, añadimos un error
+    ModelState.AddModelError("ClasesInscritas",
+        "Error, No se puede seleccionar la misma clase deportiva dos veces");
+}
+
+
 // buscamos al usuario por su nombre de usuario
 var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == inscripcionForCreate.ClienteUserName); //devuelve o null o el cliente
 
@@ -61,6 +72,13 @@ var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == inscrip
 if (user == null)
 {
     ModelState.AddModelError("InscripcionApplicationUser","Error, El usuario no está registrado");
+}
+// comprobamos que el metodo de pago exista en nuestro enum
+if (!Enum.IsDefined(inscripcionForCreate.MetodoPago))
+{
+    // si no es valido añadimos un error
+    ModelState.AddModelError("MetodoPago",
+        "Error, El metodo de pago seleccionado no es valido");
 }
 
 // si hay algún error , tipo  no ha seleccionado clase deportiva o el usuario no existe entra en el if
@@ -72,10 +90,24 @@ if (ModelState.ErrorCount > 0)
 var clasesIds = inscripcionForCreate.ClasesInscritas.Select(ci => ci.ClaseDeportivaId).ToList();//filtramos solo por los ids y transformamos a lista
 
 // buscamos esas clases en la base de datos
-var clasesDeportivas = await _context.ClasesDeportivas.Where(cd => clasesIds.Contains(cd.Id)).ToListAsync();//buscamos en la base  de datos los ids  de  las clases deportivas  que ha generado la lista
-    // comprobamos que cada clase existe y tiene suficientes plazas (validar)
+// buscamos las clases en la base de datos y cargamos también su tipo de deporte
+var clasesDeportivas = await _context.ClasesDeportivas
+    .Include(cd => cd.TipoDeporte)
+    .Where(cd => clasesIds.Contains(cd.Id))
+    .ToListAsync();    // comprobamos que cada clase existe y tiene suficientes plazas (validar)
 foreach (var item in inscripcionForCreate.ClasesInscritas)//por cada clase  que el cliente quiere reservar
 {//item es cada una de  esas clases
+
+// comprobamos que se reservan entre 1 y 3 plazas si no entra al error 
+if (item.PlazasReservadas < 1 || item.PlazasReservadas > 3)
+{
+    // añadimos un error si la cantidad no es valida
+    ModelState.AddModelError("ClasesInscritas",
+        "Error, Debe reservar entre 1 y 3 plazas");
+
+    // pasamos al siguiente item porque esta cantidad no es valida
+    continue;
+}
     var clase = clasesDeportivas.FirstOrDefault(cd => cd.Id == item.ClaseDeportivaId);//buscamos la clase correspondiente al item con su id
 
     // la clase no existe
@@ -158,8 +190,18 @@ var inscripcionDetail = new InscripcionClaseDeportivaDetailDTO(
     inscripcion.FechaInscripcion,
     inscripcion.PrecioTotal,
     inscripcion.MetodoPago,
-    inscripcionForCreate.ClasesInscritas
-);
+// creamos la lista del resumen con los datos reales de las clases deportivas
+inscripcion.ClasesInscritas
+    .Select(ci => new InscripcionClaseDeportivaItemDTO(
+        ci.ClaseDeportiva.Id,              // id 
+        ci.ClaseDeportiva.Descripcion,     // descripcion 
+        ci.ClaseDeportiva.TipoDeporte.Nombre, // deporte 
+        ci.ClaseDeportiva.FechaHora,       // fecha y hora 
+        ci.PlazasReservadas,              // plazas reservadas
+        ci.Precio,                        // precio calculado 
+        ci.Observaciones                  // observaciones
+    ))
+    .ToList());
 
 // devolvemos 201 Created y el detalle de la inscripción
 return CreatedAtAction(
