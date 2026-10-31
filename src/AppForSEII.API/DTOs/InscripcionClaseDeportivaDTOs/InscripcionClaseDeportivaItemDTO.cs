@@ -1,9 +1,10 @@
 namespace AppForSEII.API.DTOs.InscripcionClaseDeportivaDTOs
 {//dto de una clase deportiva con el detalle de inscripcion
     public class InscripcionClaseDeportivaItemDTO
-    {
-        public InscripcionClaseDeportivaItemDTO(string descripcion, string tipoDeporte, DateTime fechaHora, int plazasReservadas, decimal precio, string? observaciones)
+    {                                             //añadimos  claseDeportivaId para cuando se hace  el post(al crear una inscripcion) tener claro a que ClaseDeportiva se refiere
+        public InscripcionClaseDeportivaItemDTO(int claseDeportivaId,string descripcion, string tipoDeporte, DateTime fechaHora, int plazasReservadas, decimal precio, string? observaciones)
         {//constructor para crear un item por cada claseInscrita
+        ClaseDeportivaId=claseDeportivaId;
             Descripcion = descripcion;
             TipoDeporte = tipoDeporte;
             FechaHora = fechaHora;
@@ -11,7 +12,7 @@ namespace AppForSEII.API.DTOs.InscripcionClaseDeportivaDTOs
             Precio = precio;
             Observaciones = observaciones;
         }
-
+        public int ClaseDeportivaId { get; set; }//id de  la clase deportiva de la base de datos
         [Required]//obligatorio
         public string Descripcion{get;set;}
         [Required]//obligatorio
@@ -19,7 +20,8 @@ namespace AppForSEII.API.DTOs.InscripcionClaseDeportivaDTOs
         [DataType(System.ComponentModel.DataAnnotations.DataType.DateTime)]//contiene fecha y hora
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}")]//formato
         public DateTime FechaHora{get;set;}
-        [Range(1,3)]//rango permitido segun el CU4 entre 1 y 3 plazas a reservar
+        //rango permitido segun el CU4 entre 1 y 3 plazas a reservar
+        [Range(1, 3, ErrorMessage = "Debe reservar entre 1 y 3 plazas")]
         public int PlazasReservadas{get;set;}
         
          [DataType(System.ComponentModel.DataAnnotations.DataType.Currency)] //indicamos que es dinero
