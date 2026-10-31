@@ -28,12 +28,24 @@ namespace AppForSEII.API.DTOs.InscripcionClaseDeportivaDTOs
          [Range(0,999.99)]//rango del precio
         public decimal Precio{get;set;}
         public string? Observaciones{get;set;}//observaciones, puede ser null 
-        
-        
 
+        public override bool Equals(object? obj)//comparamos dos ItemDto para las pruebas unitarias
+        {//comparamos propiedades
+            return obj is InscripcionClaseDeportivaItemDTO dTO &&
+                   ClaseDeportivaId == dTO.ClaseDeportivaId &&
+                   Descripcion == dTO.Descripcion &&
+                   TipoDeporte == dTO.TipoDeporte &&
+                   FechaHora == dTO.FechaHora &&
+                   PlazasReservadas == dTO.PlazasReservadas &&
+                   Precio == dTO.Precio &&
+                   Observaciones == dTO.Observaciones;
+        }
 
-
-
+        public override int GetHashCode()
+        {
+    // Si dos ItemDTO tienen los mismos datos, generaran el mismo hash
+            return HashCode.Combine(ClaseDeportivaId, Descripcion, TipoDeporte, FechaHora, PlazasReservadas, Precio, Observaciones);
+        }
     }
 
 
