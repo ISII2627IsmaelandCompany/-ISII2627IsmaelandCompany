@@ -185,22 +185,6 @@ public static void SeedTiposDeporteAndPistas(ApplicationDbContext dbcontext)
 
     dbcontext.SaveChanges();
 
-    //Ceación de las reservas para probar la disponibilidad
-
-    var pistaBaloncesto = dbcontext.Pistas.FirstOrDefault(p=>p.NombrePista == "Pista de baloncesto"); //la pista que voy a reservar
-    if(pistaBaloncesto != null && !dbcontext.Reservas.Any())//comprobar si existe
-    {
-        Reserva reservaHoy = new Reserva(MetodoPago.Tarjeta, DateTime.Today, 12.00m);
-    
-        PistaReservada pistaReservada = new PistaReservada //creo la reserva
-        {
-            Pista = pistaBaloncesto,
-            Reserva = reservaHoy
-        };
-        dbcontext.Reservas.Add(reservaHoy);//añado la reserva al dbset
-        dbcontext.SaveChanges();//guardo los cambios
-    }
-
 }
 //******************************************************************************************
 public static void SeedCompeticiones(ApplicationDbContext dbcontext)
