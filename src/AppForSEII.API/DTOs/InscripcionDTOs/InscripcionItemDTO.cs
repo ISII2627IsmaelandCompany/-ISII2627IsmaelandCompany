@@ -32,5 +32,19 @@ namespace AppForSEII.API.DTOs.InscripcionDTOs
 
         [StringLength(200)]
         public string? ProblemasFisicos { get; set; }
+        public override bool Equals(object? obj)
+        {
+            return obj is InscripcionItemDTO dto &&
+                   Nombre == dto.Nombre &&
+                   Lugar == dto.Lugar &&
+                   Fecha == dto.Fecha &&
+                   Precio == dto.Precio &&
+                   ProblemasFisicos == dto.ProblemasFisicos;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Nombre, Lugar, Fecha, Precio, ProblemasFisicos);
+        }
     }
 }
