@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using DataType = System.ComponentModel.DataAnnotations.DataType;
 
 namespace AppForSEII.API.DTOs.InscripcionDTOs
@@ -56,5 +57,41 @@ namespace AppForSEII.API.DTOs.InscripcionDTOs
         public MetodoPago MetodoPago { get; set; }
 
         public IList<InscripcionItemDTO> CompeticionesInscritas { get; set; }
+
+        public bool Equals(InscripcionDetailDTO? other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            return Id == other.Id
+                && Nombre == other.Nombre
+                && Apellidos == other.Apellidos
+                && DNI == other.DNI
+                && Email == other.Email
+                && Telefono == other.Telefono
+                && FechaInscripcion == other.FechaInscripcion
+                && PrecioTotal == other.PrecioTotal
+                && MetodoPago == other.MetodoPago
+                && CompeticionesInscritas.SequenceEqual(other.CompeticionesInscritas);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is InscripcionDetailDTO other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(
+                Id,
+                Nombre,
+                Apellidos,
+                DNI,
+                Email,
+                Telefono,
+                FechaInscripcion,
+                HashCode.Combine(PrecioTotal, MetodoPago, CompeticionesInscritas));
+        }
+
     }
 }

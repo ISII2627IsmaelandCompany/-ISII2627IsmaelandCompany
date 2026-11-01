@@ -42,6 +42,39 @@ namespace AppForSEII.API.DTOs.InscripcionClaseDeportivaDTOs
 
         public IList<InscripcionClaseDeportivaItemDTO> ClasesInscritas {get; set;}//Lista con cada una de las clases incluidas dentro de esa inscripcion
 
-      
+        public override bool Equals(object? obj)//comparamos dos dtos de details para ver si son iguales para las pruebas unitarias
+        {//comprobamos todas las propiedades de ambas inscripciones
+            return obj is InscripcionClaseDeportivaDetailDTO dTO &&
+                   Id == dTO.Id &&
+                   Nombre == dTO.Nombre &&
+                   Apellidos == dTO.Apellidos &&
+                   DNI == dTO.DNI &&
+                   Email == dTO.Email &&
+                   Telefono == dTO.Telefono &&
+                   FechaInscripcion == dTO.FechaInscripcion &&
+                   PrecioTotal == dTO.PrecioTotal &&
+                   MetodoPago == dTO.MetodoPago &&
+                  ClasesInscritas.SequenceEqual(dTO.ClasesInscritas);//comparamos que ambas listas tengan la misma clases inscritas,en el mismo orden (compara elemento a elemento)
+        }
+
+        public override int GetHashCode()
+        {
+            HashCode hash = new HashCode();
+            hash.Add(Id);
+            hash.Add(Nombre);
+            hash.Add(Apellidos);
+            hash.Add(DNI);
+            hash.Add(Email);
+            hash.Add(Telefono);
+            hash.Add(FechaInscripcion);
+            hash.Add(PrecioTotal);
+            hash.Add(MetodoPago);
+            // añadimos cada clase inscrita para tener en cuenta el contenido de la lista
+            foreach (var clase in ClasesInscritas)
+         {
+            hash.Add(clase);
+        }            
+            return hash.ToHashCode();
+        }
     }
 }
