@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 
-
+using AppForSEII.API.Models;
 namespace AppForSEII.API.Controllers
 {
     [Route("api/[controller]")]//ruta base del controlador
@@ -121,6 +121,159 @@ namespace AppForSEII.API.Controllers
 
             return Ok(inscripcion);
         }
+
+[HttpPost]
+[Route("[action]")]
+[ProducesResponseType(typeof(InscripcionDetailDTO), (int)HttpStatusCode.Created)]
+[ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
+[ProducesResponseType((int)HttpStatusCode.Conflict)]
+public async Task<ActionResult> CrearInscripcion(CrearInscripcionDTO crearInscripcionDTO)//post de crear inscripcion
+{
+    //VALIDAMOS LOS DATOS RECIBIDOS (FLUJOS ALTERNATIVOS)
+    // Comprobar que se ha seleccionado al menos una competición
+    if (crearInscripcionDTO.CompeticionesSeleccionadas == null ||
+        crearInscripcionDTO.CompeticionesSeleccionadas.Count == 0)
+    {
+        ModelState.AddModelError(
+            "CompeticionesSeleccionadas",
+            "Debe seleccionar al menos una competición.");
+
+        return BadRequest(new ValidationProblemDetails(ModelState));
+    }
+
+    // Comprobar que no se ha seleccionado la misma competición varias veces
+    var idsCompeticiones = crearInscripcionDTO.CompeticionesSeleccionadas
+        .Select(c => c.IdCompeticion)
+        .ToList();
+
+    if (idsCompeticiones.Distinct().Count() != idsCompeticiones.Count)
+    {
+        ModelState.AddModelError(
+            "CompeticionesSeleccionadas",
+            "No se puede seleccionar una misma competición varias veces.");
+
+        return BadRequest(new ValidationProblemDetails(ModelState));
+    }
+
+    // Buscar al cliente por su nombre de usuario
+    var cliente = await _context.Users
+        .FirstOrDefaultAsync(u => u.UserName == crearInscripcionDTO.NombreUsuarioCliente);
+
+    if (cliente == null)
+    {
+        _logger.LogError(
+            $"No existe el cliente {crearInscripcionDTO.NombreUsuarioCliente}");
+
+        return BadRequest();
+    }
+
+    // Obtener las competiciones seleccionadas desde la base de datos
+    var competiciones = await _context.Competiciones
+        .Where(c => idsCompeticiones.Contains(c.Id))
+        .ToListAsync();
+
+    // Comprobar que existen todas las competiciones solicitadas
+    if (competiciones.Count != idsCompeticiones.Count)
+    {
+        ModelState.AddModelError(
+            "CompeticionesSeleccionadas",
+            "Una o varias competiciones no existen.");
+
+        return BadRequest(new ValidationProblemDetails(ModelState));
+    }
+    //COMPROBACIONES
+    // Comprobar que todas las competiciones tienen plazas disponibles
+    foreach (var competicion in competiciones)
+    {
+        var plazasOcupadas = await _context.Set<CompeticionInscripcion>()
+            .CountAsync(ci => ci.CompeticionId == competicion.Id);
+
+        if (plazasOcupadas >= competicion.Plazas)
+        {
+            ModelState.AddModelError(
+                "CompeticionesSeleccionadas",
+                $"No quedan plazas disponibles para la competición {competicion.Nombre}.");
+
+            return BadRequest(new ValidationProblemDetails(ModelState));
+        }
+    }
+
+    // Calcular el precio total usando los precios almacenados en la base de datos
+    decimal precioTotal = competiciones.Sum(c => c.Precio);
+
+    // Crear la inscripción
+    var inscripcion = new Inscripcion(
+        cliente,
+        string.Empty,
+        DateTime.Now,
+        crearInscripcionDTO.MetodoPago,
+        precioTotal
+    );
+
+    // Asociar cada competición a la inscripción
+    foreach (var competicion in competiciones)
+    {
+        var competicionSeleccionada = crearInscripcionDTO.CompeticionesSeleccionadas
+            .First(c => c.IdCompeticion == competicion.Id);
+
+        var relacion = new CompeticionInscripcion
+        {
+            CompeticionId = competicion.Id,
+            Competicion = competicion,
+            Inscripcion = inscripcion,
+            ProblemasFisicos = competicionSeleccionada.ProblemasFisicos
+        };
+
+        inscripcion.CompeticionInscripciones.Add(relacion);
+    }
+
+    // Validar el estado del modelo antes de guardar
+    if (!ModelState.IsValid)
+    {
+        return BadRequest(new ValidationProblemDetails(ModelState));
+    }
+
+    try
+    {
+        _context.Inscripciones.Add(inscripcion);
+        await _context.SaveChangesAsync();
+    }
+    catch (DbUpdateException ex)
+    {
+        _logger.LogError(ex, "Error al guardar la inscripción.");
+
+        return Conflict();
+    }
+    //INSERTAMOS LOS DATOS EN LA BDA
+    // Preparar los datos de la inscripción creada
+    var inscripcionDetail = new InscripcionDetailDTO(
+        inscripcion.Id,
+        cliente.Name,
+        cliente.Surname,
+        cliente.DNI,
+        cliente.Email,
+        cliente.PhoneNumber,
+        inscripcion.FechaInscripcion,
+        inscripcion.PrecioTotal,
+        inscripcion.MetodoPago,
+        inscripcion.CompeticionInscripciones
+            .Select(ci => new InscripcionItemDTO(
+                ci.Competicion.Nombre,
+                ci.Competicion.Lugar,
+                ci.Competicion.Fecha,
+                ci.Competicion.Precio,
+                ci.ProblemasFisicos
+            ))
+            .ToList()
+    );
+    //DEVOLVEMOS EL OK Y EL DETAIL
+    return CreatedAtAction(
+        nameof(GetInscripcion),
+        new { id = inscripcion.Id },
+        inscripcionDetail
+    );
+}
+
     }
 }
 

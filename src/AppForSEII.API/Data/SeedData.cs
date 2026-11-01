@@ -135,7 +135,7 @@ namespace AppForSEII.API.Data {
     dbcontext.SaveChanges();
 }
 
-//***********************************************
+//***********************************************************************************DANI
 public static void SeedTiposDeporteAndPistas(ApplicationDbContext dbcontext)
 {
     string[] tiposDeporteNombres= ["Baloncesto", "Futbol", "Tenis"];
@@ -156,7 +156,7 @@ public static void SeedTiposDeporteAndPistas(ApplicationDbContext dbcontext)
     if (dbcontext.Pistas.FirstOrDefault(
         p => p.NombrePista == "Pista de baloncesto") ==null)
     {
-        var pista= new Pista("Pista de baloncesto",12.00,20,1);
+        var pista= new Pista("Pista de baloncesto",12.00,20,0);
 
         pista.TipoDeporte= tiposDeporte[0];
 
@@ -184,8 +184,9 @@ public static void SeedTiposDeporteAndPistas(ApplicationDbContext dbcontext)
     }
 
     dbcontext.SaveChanges();
+
 }
-//************************************
+//******************************************************************************************
 public static void SeedCompeticiones(ApplicationDbContext dbcontext)
 {
     string[] tiposDeporteNombres = ["Baloncesto", "Futbol", "Tenis"];
