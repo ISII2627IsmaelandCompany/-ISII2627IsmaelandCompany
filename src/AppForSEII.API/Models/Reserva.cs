@@ -25,6 +25,7 @@ public class Reserva
     [Range(0, 999.99,ErrorMessage = "El precio total no puede ser negativo y máximo 999.99")]//rango de precio
     public decimal PrecioTotal { get; set; }
 
+    public ApplicationUser Cliente { get; set; } // Relación N a 1 con ApplicationUser
 
 
     
@@ -34,8 +35,9 @@ public class Reserva
     public Reserva()
     {
     }
-    public Reserva(MetodoPago metodoPago, DateTime fechaReserva, decimal precioTotal)
+    public Reserva(ApplicationUser cliente, MetodoPago metodoPago, DateTime fechaReserva, decimal precioTotal)
     {
+        Cliente = cliente;
         MetodoPago = metodoPago;
         FechaReserva = fechaReserva;
         PrecioTotal = precioTotal;
