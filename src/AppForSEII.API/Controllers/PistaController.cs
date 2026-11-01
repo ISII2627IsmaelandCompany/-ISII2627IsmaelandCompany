@@ -52,6 +52,11 @@ namespace AppForSEII.API.Controllers
                 p.TipoDeporte.Nombre))//para pasar el noombre del tipoDeporte
                 .ToListAsync();//Ejecuta la consulta de forma asíncrona y devuelve los resultados en una lista
 
+            if(pistas ==null || !pistas.Any()){
+                ModelState.AddModelError("PistasDisponibles", "No hay pistas disponibles para la fecha o el deporte seleccionado");
+                _logger.LogError($"{DateTime.Now} Error: No hay pistas disponibles");
+                return BadRequest(new ValidationProblemDetails(ModelState));
+            }
         return Ok(pistas);//Devuelve una respuesta HTTP 200 OK, contiene la lista de pistas encontradas
 
         }
