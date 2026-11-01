@@ -5,8 +5,9 @@ namespace AppForSEII.API.Models
         public Alquiler()
         {
         }
-        public Alquiler(DateTime fechaAlquiler, int idAlquiler, List<MaterialAlquilado> materialesAlquilados, MetodoPago metodoPago, int precioTotal)
+        public Alquiler(ApplicationUser cliente, DateTime fechaAlquiler, int idAlquiler, List<MaterialAlquilado> materialesAlquilados, MetodoPago metodoPago, int precioTotal)
         {
+           Cliente = cliente;
            FechaAlquiler = DateTime.Now;
            IdAlquiler = idAlquiler;
            MaterialesAlquilados = materialesAlquilados;
@@ -29,5 +30,6 @@ namespace AppForSEII.API.Models
         [Range(0, int.MaxValue, ErrorMessage = "El precio total no puede ser negativo.")]
         public int PrecioTotal { get; set; }
         public List<MaterialAlquilado> MaterialesAlquilados { get; set; } = new List<MaterialAlquilado>();//cardinalidad 1 a muchos con MaterialAlquilado
+        public ApplicationUser Cliente { get; set; } // Relación N a 1 con ApplicationUser
     }
 }
