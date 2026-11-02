@@ -37,10 +37,11 @@ public class PistaReservada
     {
         
     }
-    public PistaReservada(Pista pista, int cantidad, double precio)
+    public PistaReservada(Pista pista, Reserva reserva, int cantidad, double precio)
     {
         Pista = pista;
         IdPista = Pista.IdPista;
+        Reserva = reserva;
         IdReserva = Reserva.Id;
         this.Cantidad = cantidad;
         this.Precio = precio;
