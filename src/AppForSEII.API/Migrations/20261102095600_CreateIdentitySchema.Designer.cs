@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppForSEII.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261018152637_CreateIdentitySchema")]
+    [Migration("20261102095600_CreateIdentitySchema")]
     partial class CreateIdentitySchema
     {
         /// <inheritdoc />
@@ -33,6 +33,9 @@ namespace AppForSEII.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdAlquiler"));
 
+                    b.Property<string>("ClienteId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("FechaAlquiler")
                         .HasColumnType("datetime2");
 
@@ -44,6 +47,8 @@ namespace AppForSEII.API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("IdAlquiler");
+
+                    b.HasIndex("ClienteId");
 
                     b.ToTable("Alquileres");
                 });
@@ -335,6 +340,10 @@ namespace AppForSEII.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ClienteId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("FechaReserva")
                         .HasColumnType("datetime2");
 
@@ -346,6 +355,8 @@ namespace AppForSEII.API.Migrations
                         .HasColumnType("decimal(5,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClienteId");
 
                     b.ToTable("Reservas");
                 });
@@ -620,6 +631,15 @@ namespace AppForSEII.API.Migrations
                     b.ToTable("Pistas");
                 });
 
+            modelBuilder.Entity("AppForSEII.API.Models.Alquiler", b =>
+                {
+                    b.HasOne("AppForSEII.API.Models.ApplicationUser", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteId");
+
+                    b.Navigation("Cliente");
+                });
+
             modelBuilder.Entity("AppForSEII.API.Models.ClaseDeportiva", b =>
                 {
                     b.HasOne("AppForSEII.API.Models.TipoDeporte", "TipoDeporte")
@@ -716,6 +736,17 @@ namespace AppForSEII.API.Migrations
                     b.Navigation("Pista");
 
                     b.Navigation("Reserva");
+                });
+
+            modelBuilder.Entity("AppForSEII.API.Models.Reserva", b =>
+                {
+                    b.HasOne("AppForSEII.API.Models.ApplicationUser", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
                 });
 
             modelBuilder.Entity("Competicion", b =>
