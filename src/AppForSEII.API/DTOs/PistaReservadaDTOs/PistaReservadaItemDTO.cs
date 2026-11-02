@@ -24,5 +24,23 @@ namespace AppForSEII.API.DTOs.PistaReservadaDTOs
         public double Precio { get; set; }
         [Range(1, 30, ErrorMessage = "La cantidad debe estar entre 1 y 30.")]
         public int Cantidad { get; set; }
+    
+
+    public override bool Equals(object? obj)//comparamos dos ItemDto para las pruebas unitarias
+        {//comparamos propiedades
+            return obj is PistaReservadaItemDTO dTO &&
+                   IdPista == dTO.IdPista &&
+                   NombrePista == dTO.NombrePista &&
+                   TipoDeporte == dTO.TipoDeporte &&
+                   Observaciones == dTO.Observaciones &&
+                   Precio == dTO.Precio &&
+                   Cantidad == dTO.Cantidad;
+        }
+
+        public override int GetHashCode()
+        {
+    // Si dos ItemDTO tienen los mismos datos, generaran el mismo hash
+            return HashCode.Combine(IdPista, NombrePista, TipoDeporte, Observaciones, Precio, Cantidad);
+        }
     }
-}
+}    
