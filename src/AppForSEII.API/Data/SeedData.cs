@@ -65,6 +65,27 @@ namespace AppForSEII.API.Data {
 
                 logger.LogError(ex, "An error occurred seeding Inscripcion and ClaseInscrita in the Database.");//registramos cualquier error en el log
             }
+
+            try
+            {
+                // Inicializa reservas y pistas reservadas para el details
+                SeedReservasAndPistasReservadas(dbContext); 
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred seeding Reserva and PistaReservada in the Database.");
+            }
+
+
+            try
+            {
+                // Inicializa un alquiler con sus materiales alquilados para el details
+                SeedAlquileresAndMaterialesAlquilados(dbContext);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred seeding Alquiler and MaterialAlquilado in the Database.");
+            }
             
         }
         
@@ -184,8 +205,54 @@ public static void SeedTiposDeporteAndPistas(ApplicationDbContext dbcontext)
     }
 
     dbcontext.SaveChanges();
-
 }
+
+public static void SeedReservasAndPistasReservadas(ApplicationDbContext dbcontext)
+{
+    // Buscamos las dos pistas que creamos en el seed anterior (baloncesto y fútbol)
+    var cliente = dbcontext.Users.FirstOrDefault(u => u.Email == "peter@uclm.es");
+    // Buscamos las pistas deportivas ya creadas en el seed de tipo deporte y pistas
+    var pistaBaloncesto = dbcontext.Pistas.FirstOrDefault(p => p.NombrePista == "Pista de baloncesto");
+    var pistaFutbol = dbcontext.Pistas.FirstOrDefault(p => p.NombrePista == "Pista de futbol");
+
+    if (cliente != null && pistaBaloncesto != null && pistaFutbol != null && !dbcontext.PistaReservada.Any())//comprobamos q exista el cliente para hacer la reserva
+    {
+        // Creamos la reserva pasandole el objeto cliente 
+        var reserva = new Reserva(cliente,MetodoPago.Tarjeta,new DateTime(2026,11,02),26.00m);
+       
+        dbcontext.Reservas.Add(reserva);
+        dbcontext.SaveChanges(); // Guardamos para que la reserva obtenga su ID
+    
+        // Creamos la primera pista reservada 
+        var pistaReservada1 = new PistaReservada()
+        {
+            Pista = pistaBaloncesto,
+            IdPista = pistaBaloncesto.IdPista,
+            Reserva = reserva,
+            IdReserva = reserva.Id,
+            Cantidad = 2,
+            Precio = 12.00 * 2, // Precio unitario de la pista de baloncesto multiplicado por la cantidad
+            Observaciones = "Reserva para entrenamiento de baloncesto",
+        };
+
+        // 5. Creamos la segunda pista reservada 
+        var pistaReservada2 = new PistaReservada()
+        {
+            Pista = pistaFutbol,
+    IdPista = pistaFutbol.IdPista,
+    Reserva = reserva,
+    IdReserva = reserva.Id,
+    Cantidad = 1,
+    Precio = 15.00,
+    Observaciones = "Reserva para partido de futbol",
+        };
+    
+
+        dbcontext.PistaReservada.AddRange(pistaReservada1, pistaReservada2);
+        dbcontext.SaveChanges();
+    }
+}   
+
 //******************************************************************************************
 public static void SeedCompeticiones(ApplicationDbContext dbcontext)
 {
@@ -448,6 +515,63 @@ public static void SeedInscripcionesAndClasesInscritas(ApplicationDbContext dbco
         };
 
         dbcontext.ClasesInscritas.AddRange(claseInscrita1,claseInscrita2);
+
+        dbcontext.SaveChanges();
+    }
+}
+
+//-------Para probar el details de alquiler
+public static void SeedAlquileresAndMaterialesAlquilados(ApplicationDbContext dbcontext) 
+{
+    // buscamos al cliente ya creado, concretamente Peter
+    var cliente = dbcontext.Users.FirstOrDefault(u => u.Email == "peter@uclm.es");
+
+    // buscamos dos materiales ya creados en SeedTiposMaterialAndMateriales
+    var balonBaloncesto = dbcontext.Materials.FirstOrDefault(m => m.Nombre == "Balon de baloncesto");
+    var raquetaTenis = dbcontext.Materials.FirstOrDefault(m => m.Nombre == "Raqueta de tenis");
+
+    // solo creamos el alquiler si existen el cliente y los materiales y todavía no hay ningún alquiler
+    if (cliente != null && balonBaloncesto != null && raquetaTenis != null && !dbcontext.Alquileres.Any())
+    {
+        // Alquiler: 2 balones 2 x 3 = 6 + 1 raqueta 1 x 5 = 5 = 11
+        var alquiler = new Alquiler
+        {
+            Cliente = cliente,                          // relación con el usuario
+            FechaAlquiler = new DateTime(2026, 11, 10), // fecha elegida por el cliente
+            MetodoPago = MetodoPago.Tarjeta,
+            PrecioTotal = 11
+        };
+
+        dbcontext.Alquileres.Add(alquiler);
+
+        // Guardamos para que el alquiler tenga IdAlquiler
+        dbcontext.SaveChanges();
+
+        // 2 balones de baloncesto
+        var materialAlquilado1 = new MaterialAlquilado
+        {
+            Cantidad = 2,
+            Descripcion = "Balones para entrenamiento de baloncesto",
+            Precio = 6.00m,
+            Material = balonBaloncesto,
+            IdMaterial = balonBaloncesto.IdMaterial,
+            Alquiler = alquiler,
+            IdAlquiler = alquiler.IdAlquiler
+        };
+
+        // 1 raqueta de tenis
+        var materialAlquilado2 = new MaterialAlquilado
+        {
+            Cantidad = 1,
+            Descripcion = "Raqueta para partido de tenis",
+            Precio = 5.00m,
+            Material = raquetaTenis,
+            IdMaterial = raquetaTenis.IdMaterial,
+            Alquiler = alquiler,
+            IdAlquiler = alquiler.IdAlquiler
+        };
+
+        dbcontext.MaterialAlquilados.AddRange(materialAlquilado1, materialAlquilado2);
 
         dbcontext.SaveChanges();
     }
