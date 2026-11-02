@@ -491,6 +491,63 @@ public static void SeedInscripcionesAndClasesInscritas(ApplicationDbContext dbco
     }
 }
 
+//-------Para probar el details de alquiler
+public static void SeedAlquileresAndMaterialesAlquilados(ApplicationDbContext dbcontext) 
+{
+    // buscamos al cliente ya creado, concretamente Peter
+    var cliente = dbcontext.Users.FirstOrDefault(u => u.Email == "peter@uclm.es");
+
+    // buscamos dos materiales ya creados en SeedTiposMaterialAndMateriales
+    var balonBaloncesto = dbcontext.Materials.FirstOrDefault(m => m.Nombre == "Balon de baloncesto");
+    var raquetaTenis = dbcontext.Materials.FirstOrDefault(m => m.Nombre == "Raqueta de tenis");
+
+    // solo creamos el alquiler si existen el cliente y los materiales y todavía no hay ningún alquiler
+    if (cliente != null && balonBaloncesto != null && raquetaTenis != null && !dbcontext.Alquileres.Any())
+    {
+        // Alquiler: 2 balones 2 x 3 = 6 + 1 raqueta 1 x 5 = 5 = 11
+        var alquiler = new Alquiler
+        {
+            Cliente = cliente,                          // relación con el usuario
+            FechaAlquiler = new DateTime(2026, 11, 10), // fecha elegida por el cliente
+            MetodoPago = MetodoPago.Tarjeta,
+            PrecioTotal = 11
+        };
+
+        dbcontext.Alquileres.Add(alquiler);
+
+        // Guardamos para que el alquiler tenga IdAlquiler
+        dbcontext.SaveChanges();
+
+        // 2 balones de baloncesto
+        var materialAlquilado1 = new MaterialAlquilado
+        {
+            Cantidad = 2,
+            Descripcion = "Balones para entrenamiento de baloncesto",
+            Precio = 6.00m,
+            Material = balonBaloncesto,
+            IdMaterial = balonBaloncesto.IdMaterial,
+            Alquiler = alquiler,
+            IdAlquiler = alquiler.IdAlquiler
+        };
+
+        // 1 raqueta de tenis
+        var materialAlquilado2 = new MaterialAlquilado
+        {
+            Cantidad = 1,
+            Descripcion = "Raqueta para partido de tenis",
+            Precio = 5.00m,
+            Material = raquetaTenis,
+            IdMaterial = raquetaTenis.IdMaterial,
+            Alquiler = alquiler,
+            IdAlquiler = alquiler.IdAlquiler
+        };
+
+        dbcontext.MaterialAlquilados.AddRange(materialAlquilado1, materialAlquilado2);
+
+        dbcontext.SaveChanges();
+    }
+}
+
 
     }
 
