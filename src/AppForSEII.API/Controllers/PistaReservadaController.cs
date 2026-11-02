@@ -25,25 +25,30 @@ namespace AppForSEII.API.Controllers
         [ProducesResponseType(typeof(PistaReservadaDetailDTO), (int)HttpStatusCode.OK)]//todo correcto devuelve 200 OK e informacion
         [ProducesResponseType((int)HttpStatusCode.NotFound)]//va mal = 404 not found
 
-        public async Task<ActionResult> GetReserva(int id)//id de la reserva a consultar, la recibe por parametro
+        public async Task<ActionResult> GetPistaReservada(int idPista, int idReserva)//id de la reserva a consultar, la recibe por parametro
         {
             
-            var reserva=await _context.Reservas.Where(i => i.Id == id)//filtra hasta encontrar esa id
-    .Include(r => r.PistasReservadas)// Cargamos la lista de pistas reservadas de esta reserva
-        .ThenInclude(pr => pr.Pista)// Para cada pista reservada, cargamos su Pista
-            .ThenInclude(p => p.TipoDeporte)//para cada pista cargamos su tipo deporte
+            var Pistareservada=await _context.PistaReservada
+            .Where(pr => pr.IdPista == idPista && pr.IdReserva == idReserva)//filtra hasta encontrar esa id
+        .Include (pr => pr.Pista)// Cargamos el cliente de esta reserva
+        .ThenInclude(p => p.TipoDeporte)// Para cada pista cargamos su tipo de deporte
+            .Include(pr => pr.Reserva)//para cada pista reservada cargamos la reserva
+            .ThenInclude(r => r.Cliente)//para cada reserva cargamos el cliente
+        .Include(pr => pr.Reserva)
+        .ThenInclude(r => r.PistasReservadas)//para cada reserva cargamos las pistas reservadas
+        .ThenInclude(pRes => pRes.Pista)//para cada pista reservada cargamos la pista
+        .ThenInclude(p => p.TipoDeporte)//para cada pista cargamos el tipo de deporte
             //dto que queremos devolver al cliente
-    .Select(r => new PistaReservadaDetailDTO(r.Id,r.Cliente.Name,r.Cliente.Surname,r.Cliente.DNI, r.Cliente.Email,r.Cliente.PhoneNumber,r.FechaReserva,r.PrecioTotal,r.MetodoPago,r.PistasReservadas
-            .Select(pr => new PistaReservadaItemDTO(pr.IdPista,pr.Pista.NombrePista,pr.Pista.TipoDeporte.Nombre,pr.Observaciones,pr.Precio,pr.Cantidad)).ToList<PistaReservadaItemDTO>())).FirstOrDefaultAsync();
-            //el id , datos del cliente , datos inscripcion , datos clase inscrita , datos clase deportiva. todo esto se devuelve en lista
-            //entonces al final el firtordefault devuelve o null o toda la lista de inscripcion transformado a dto
-             if (reserva == null)//si es null entra y mensaje de error mas el 404
+    .Select(pr => new PistaReservadaDetailDTO(pr.Reserva.Id,pr.Reserva.Cliente.Name,pr.Reserva.Cliente.Surname,pr.Reserva.Cliente.DNI, pr.Reserva.Cliente.Email,pr.Reserva.Cliente.PhoneNumber,pr.Reserva.FechaReserva,pr.Reserva.PrecioTotal,pr.Reserva.MetodoPago,
+    pr.Reserva.PistasReservadas.Select(pRes => new PistaReservadaItemDTO(pRes.IdPista,pRes.Pista.NombrePista,pRes.Pista.TipoDeporte.Nombre,pRes.Observaciones,pRes.Precio,pRes.Cantidad)).ToList())).FirstOrDefaultAsync();
+          
+    if (Pistareservada == null)            
     {
-        _logger.LogError($"No se ha encontrado la reserva con id {id}");
+        _logger.LogError($"No se ha encontrado la pista reservada con  con id IdPista {idPista} e IdReserva {idReserva}");
         return NotFound();
     }
 
-    return Ok(reserva);//sino 200 e informacion reserva
+    return Ok(Pistareservada);//sino 200 e informacion reserva
         }
     }   
 }
