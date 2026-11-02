@@ -33,7 +33,7 @@ namespace AppForSEII.API.Controllers
         .ThenInclude(pr => pr.Pista)// Para cada pista reservada, cargamos su Pista
             .ThenInclude(p => p.TipoDeporte)//para cada pista cargamos su tipo deporte
             //dto que queremos devolver al cliente
-    .Select(r => new PistaReservadaDetailDTO(r.Id,r.FechaReserva,r.NombreCliente,r.Apellidos,r.DNI,r.PrecioTotal,r.MetodoPago,r.PistasReservadas
+    .Select(r => new PistaReservadaDetailDTO(r.Id,r.Cliente.Name,r.Cliente.Surname,r.Cliente.DNI, r.Cliente.Email,r.Cliente.PhoneNumber,r.FechaReserva,r.PrecioTotal,r.MetodoPago,r.PistasReservadas
             .Select(pr => new PistaReservadaItemDTO(pr.IdPista,pr.Pista.NombrePista,pr.Pista.TipoDeporte.Nombre,pr.Observaciones,pr.Precio,pr.Cantidad)).ToList<PistaReservadaItemDTO>())).FirstOrDefaultAsync();
             //el id , datos del cliente , datos inscripcion , datos clase inscrita , datos clase deportiva. todo esto se devuelve en lista
             //entonces al final el firtordefault devuelve o null o toda la lista de inscripcion transformado a dto
