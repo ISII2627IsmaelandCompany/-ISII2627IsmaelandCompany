@@ -65,6 +65,18 @@ namespace AppForSEII.API.Data {
 
                 logger.LogError(ex, "An error occurred seeding Inscripcion and ClaseInscrita in the Database.");//registramos cualquier error en el log
             }
+
+            try
+            {
+                // Inicializa reservas y pistas reservadas para el details
+                SeedReservasAndPistasReservadas(dbContext); 
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred seeding Reserva and PistaReservada in the Database.");
+            }
+
+
             try
             {
                 // Inicializa un alquiler con sus materiales alquilados para el details
@@ -212,19 +224,27 @@ public static void SeedReservasAndPistasReservadas(ApplicationDbContext dbcontex
         dbcontext.SaveChanges(); // Guardamos para que la reserva obtenga su ID
     
         // 4. Creamos la primera pista reservada 
-        var pistaReservada1 = new PistaReservada(pistaBaloncesto,2,24.00)
+        var pistaReservada1 = new PistaReservada()
         {
+            Pista = pistaBaloncesto,
+            IdPista = pistaBaloncesto.IdPista,
             Reserva = reserva,
             IdReserva = reserva.Id,
-            Observaciones = "Sin observaciones",
+            Cantidad = 2,
+            Precio = 12.00 * 2, // Precio unitario de la pista de baloncesto multiplicado por la cantidad
+            Observaciones = "Reserva para entrenamiento de baloncesto",
         };
 
         // 5. Creamos la segunda pista reservada 
         var pistaReservada2 = new PistaReservada(pistaFutbol,1,15.00)
         {
+            Pista = pistaFutbol,
+            IdPista = pistaFutbol.IdPista,
             Reserva = reserva,
             IdReserva = reserva.Id,
-            Observaciones = "Reserva nocturna",
+            Cantidad = 1,
+            Precio = 15.00,
+            Observaciones = "Reserva para partido de futbol",
         };
     
 
