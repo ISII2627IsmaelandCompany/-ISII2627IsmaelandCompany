@@ -12,21 +12,6 @@ namespace AppForSEII.API.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Alquileres",
-                columns: table => new
-                {
-                    IdAlquiler = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FechaAlquiler = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    MetodoPago = table.Column<int>(type: "int", maxLength: 15, nullable: false),
-                    PrecioTotal = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Alquileres", x => x.IdAlquiler);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
@@ -68,21 +53,6 @@ namespace AppForSEII.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Reservas",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    MetodoPago = table.Column<int>(type: "int", nullable: false),
-                    FechaReserva = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PrecioTotal = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Reservas", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -133,6 +103,27 @@ namespace AppForSEII.API.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Alquileres",
+                columns: table => new
+                {
+                    IdAlquiler = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FechaAlquiler = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MetodoPago = table.Column<int>(type: "int", maxLength: 15, nullable: false),
+                    PrecioTotal = table.Column<int>(type: "int", nullable: false),
+                    ClienteId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Alquileres", x => x.IdAlquiler);
+                    table.ForeignKey(
+                        name: "FK_Alquileres_AspNetUsers_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -237,6 +228,28 @@ namespace AppForSEII.API.Migrations
                     table.PrimaryKey("PK_Inscripciones", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Inscripciones_AspNetUsers_ClienteId",
+                        column: x => x.ClienteId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reservas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    MetodoPago = table.Column<int>(type: "int", nullable: false),
+                    FechaReserva = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PrecioTotal = table.Column<decimal>(type: "decimal(5,2)", precision: 5, scale: 2, nullable: false),
+                    ClienteId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Reservas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reservas_AspNetUsers_ClienteId",
                         column: x => x.ClienteId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -452,6 +465,11 @@ namespace AppForSEII.API.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Alquileres_ClienteId",
+                table: "Alquileres",
+                column: "ClienteId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -539,6 +557,11 @@ namespace AppForSEII.API.Migrations
                 name: "IX_Pistas_TipoDeporteId",
                 table: "Pistas",
                 column: "TipoDeporteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservas_ClienteId",
+                table: "Reservas",
+                column: "ClienteId");
         }
 
         /// <inheritdoc />
@@ -596,13 +619,13 @@ namespace AppForSEII.API.Migrations
                 name: "Reservas");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "TipoMaterials");
 
             migrationBuilder.DropTable(
                 name: "TipoDeportes");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }
