@@ -215,7 +215,7 @@ public static void SeedReservasAndPistasReservadas(ApplicationDbContext dbcontex
     var pistaBaloncesto = dbcontext.Pistas.FirstOrDefault(p => p.NombrePista == "Pista de baloncesto");
     var pistaFutbol = dbcontext.Pistas.FirstOrDefault(p => p.NombrePista == "Pista de futbol");
 
-    if (cliente != null && pistaBaloncesto != null && pistaFutbol != null && !dbcontext.Reservas.Any())//comprobamos q exista el cliente para hacer la reserva
+    if (cliente != null && pistaBaloncesto != null && pistaFutbol != null && !dbcontext.PistaReservada.Any())//comprobamos q exista el cliente para hacer la reserva
     {
         // Creamos la reserva pasandole el objeto cliente 
         var reserva = new Reserva(cliente,MetodoPago.Tarjeta,new DateTime(2026,11,02),26.00m);
@@ -223,7 +223,7 @@ public static void SeedReservasAndPistasReservadas(ApplicationDbContext dbcontex
         dbcontext.Reservas.Add(reserva);
         dbcontext.SaveChanges(); // Guardamos para que la reserva obtenga su ID
     
-        // 4. Creamos la primera pista reservada 
+        // Creamos la primera pista reservada 
         var pistaReservada1 = new PistaReservada()
         {
             Pista = pistaBaloncesto,
@@ -236,15 +236,15 @@ public static void SeedReservasAndPistasReservadas(ApplicationDbContext dbcontex
         };
 
         // 5. Creamos la segunda pista reservada 
-        var pistaReservada2 = new PistaReservada(pistaFutbol,1,15.00)
+        var pistaReservada2 = new PistaReservada()
         {
             Pista = pistaFutbol,
-            IdPista = pistaFutbol.IdPista,
-            Reserva = reserva,
-            IdReserva = reserva.Id,
-            Cantidad = 1,
-            Precio = 15.00,
-            Observaciones = "Reserva para partido de futbol",
+    IdPista = pistaFutbol.IdPista,
+    Reserva = reserva,
+    IdReserva = reserva.Id,
+    Cantidad = 1,
+    Precio = 15.00,
+    Observaciones = "Reserva para partido de futbol",
         };
     
 
