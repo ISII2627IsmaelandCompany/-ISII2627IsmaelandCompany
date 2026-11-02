@@ -65,6 +65,15 @@ namespace AppForSEII.API.Data {
 
                 logger.LogError(ex, "An error occurred seeding Inscripcion and ClaseInscrita in the Database.");//registramos cualquier error en el log
             }
+            try
+            {
+                // Inicializa un alquiler con sus materiales alquilados para el details
+                SeedAlquileresAndMaterialesAlquilados(dbContext);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred seeding Alquiler and MaterialAlquilado in the Database.");
+            }
             
         }
         
