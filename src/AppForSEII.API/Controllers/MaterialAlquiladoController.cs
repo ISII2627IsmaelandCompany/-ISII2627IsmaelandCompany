@@ -1,60 +1,65 @@
-using AppForSEII.API.DTOs.MaterialAlquiladoDTOs;
-using Microsoft.AspNetCore.Http;
+using AppForSEII.API.DTOs.MaterialAlquiladoDTOs; // DTOs del details de alquiler
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppForSEII.API.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class MaterialesAlquiladosController : ControllerBase
+    [Route("api/[controller]")] // ruta del controlador
+    [ApiController] // controlador de la api
+    public class AlquileresController : ControllerBase  // controlador sin vistas, solo para devolver datos
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<MaterialesAlquiladosController> _logger;
+        private readonly ApplicationDbContext _context; // acceso a las tablas de la bbdd
+        private readonly ILogger<AlquileresController> _logger; // registrar información o errores
 
-        public MaterialesAlquiladosController(ApplicationDbContext context, ILogger<MaterialesAlquiladosController> logger)
+        // constructor inyecta automáticamente el DbContext y el logger
+        public AlquileresController(ApplicationDbContext context, ILogger<AlquileresController> logger)
         {
             _context = context;
             _logger = logger;
         }
 
-        // Obtiene la lista de materiales alquilados filtrados por ID de alquiler o ID de material.
-        [HttpGet] //Peticion GET
-        [Route("[action]")]
-        [ProducesResponseType(typeof(IList<MaterialAlquiladoDTO>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<IList<MaterialAlquiladoDTO>>> GetMaterialesAlquilados(int? idAlquiler, int? idMaterial)
+        [HttpGet] // Petición HTTP GET
+        [Route("[action]")] // Nombre del método como parte de la URL
+        [ProducesResponseType(typeof(MaterialAlquiladoDetailDTOs), (int)HttpStatusCode.OK)] // 200 OK + información
+        [ProducesResponseType((int)HttpStatusCode.NotFound)] // 404 Not Found
+        public async Task<ActionResult> GetAlquiler(int id) // id del alquiler a consultar
         {
-            // Validación opcional: Verificar parámetros no válidos
-            if (idAlquiler.HasValue && idAlquiler.Value <= 0)
+            var alquiler = await _context.Alquileres
+            .Where(a => a.IdAlquiler == id) // filtra por el id del alquiler
+            .Include(a => a.Cliente) // relación alquiler - ApplicationUser
+            .Include(a => a.MaterialesAlquilados)  // carga la lista de materiales alquilados de este alquiler
+                .ThenInclude(ma => ma.Material)   // y, de cada uno, el Material al que se refiere
+                    .ThenInclude(m => m.TipoMaterial)  // y, de cada Material, su TipoMaterial (balones o raquetas)
+            .Include(a => a.MaterialesAlquilados)  // se repite el Include para abrir otra rama del árbol de relaciones
+                .ThenInclude(ma => ma.Material)
+                    .ThenInclude(m => m.TipoDeporte)  // y, de cada Material, su TipoDeporte (baloncesto o tenis)
+            // Select proyecta la entidad en un DTO, así solo enviamos los datos necesarios
+            .Select(a => new MaterialAlquiladoDetailDTOs(
+                a.IdAlquiler,
+                a.Cliente.Name,
+                a.Cliente.Surname,
+                a.Cliente.DNI,
+                a.Cliente.Email,
+                a.Cliente.PhoneNumber,
+                a.FechaAlquiler,
+                a.PrecioTotal,
+                a.MetodoPago,
+                a.MaterialesAlquilados
+                    .Select(ma => new MaterialAlquiladoItemDTOs(  // cada línea se convierte en un DTO "item"
+                        ma.Material.Nombre,
+                        ma.Material.TipoMaterial.NombreTipoMaterial,
+                        ma.Material.TipoDeporte.Nombre,
+                        ma.Cantidad,
+                        ma.Precio))
+                    .ToList<MaterialAlquiladoItemDTOs>()))
+            .FirstOrDefaultAsync(); // devuelve el primero o null si no hay ninguno consulta la bbdd
+
+            if (alquiler == null) // si es null error 404
             {
-                ModelState.AddModelError("idAlquiler", "El ID del alquiler debe ser mayor a 0.");
-                _logger.LogError($"{DateTime.Now} Error: idAlquiler inválido ({idAlquiler}).");
-                return BadRequest(new ValidationProblemDetails(ModelState));
+                _logger.LogError($"No se ha encontrado el alquiler con id {id}"); // dejamos constancia en el log
+                return NotFound(); // 404 Not Found
             }
 
-            if (idMaterial.HasValue && idMaterial.Value <= 0)
-            {
-                ModelState.AddModelError("idMaterial", "El ID del material debe ser mayor a 0.");
-                _logger.LogError($"{DateTime.Now} Error: idMaterial inválido ({idMaterial}).");
-                return BadRequest(new ValidationProblemDetails(ModelState));
-            }
-
-            // Consulta a la base de datos
-            IList<MaterialAlquiladoDTO> listaMateriales = await _context.Set<MaterialAlquilado>()
-                .Where(m => (idAlquiler == null || m.IdAlquiler == idAlquiler)
-                         && (idMaterial == null || m.IdMaterial == idMaterial))
-                .OrderBy(m => m.IdAlquiler)
-                .ThenBy(m => m.IdMaterial)
-                .Select(m => new MaterialAlquiladoDTO(
-                    m.Cantidad,
-                    m.Descripcion,
-                    m.IdMaterial,
-                    m.IdAlquiler,
-                    m.Precio
-                ))
-                .ToListAsync();
-
-            return Ok(listaMateriales);
+            return Ok(alquiler); // 200 + detalle del alquiler
         }
     }
 }
