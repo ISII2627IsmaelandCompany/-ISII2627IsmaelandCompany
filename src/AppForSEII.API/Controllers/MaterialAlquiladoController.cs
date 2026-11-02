@@ -1,5 +1,7 @@
 using AppForSEII.API.DTOs.MaterialAlquiladoDTOs; // DTOs del details de alquiler
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace AppForSEII.API.Controllers
 {
@@ -61,5 +63,140 @@ namespace AppForSEII.API.Controllers
 
             return Ok(alquiler); // 200 + detalle del alquiler
         }
+        [HttpPost] // petición POST
+[Route("[action]")] // nombre del método en la URL
+[ProducesResponseType(typeof(MaterialAlquiladoDetailDTOs), (int)HttpStatusCode.Created)] // 201
+[ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)] // 400
+[ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)] // 409
+public async Task<ActionResult> CreateAlquiler(MaterialAlquiladoForCreateDTO alquilerForCreate)
+{
+    // Flujo alternativo 3: debe haber al menos un material
+    if (alquilerForCreate.Materiales.Count == 0)
+        ModelState.AddModelError("Materiales", "Error, Debe seleccionar al menos un material");
+
+    // No se puede repetir el mismo material
+    if (alquilerForCreate.Materiales.GroupBy(m => m.MaterialId).Any(g => g.Count() > 1))
+        ModelState.AddModelError("Materiales", "Error, No se puede seleccionar el mismo material dos veces");
+
+    // Flujo alternativo 2: fecha anterior a la actual
+    if (alquilerForCreate.FechaAlquiler.Date < DateTime.Today)
+        ModelState.AddModelError("FechaAlquiler", "Error, La fecha del alquiler no puede ser anterior a la fecha actual");
+
+    // Método de pago válido
+    if (!Enum.IsDefined(alquilerForCreate.MetodoPago))
+        ModelState.AddModelError("MetodoPago", "Error, El método de pago seleccionado no es válido");
+
+    // Buscamos al usuario
+    var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == alquilerForCreate.ClienteUserName);
+    if (user == null)
+    {
+        ModelState.AddModelError("ClienteUserName", "Error, El usuario no está registrado");
+    }
+    else
+    {
+        // Flujo alternativo 5: datos obligatorios del perfil
+        if (string.IsNullOrWhiteSpace(user.DNI))
+            ModelState.AddModelError("DNI", "Error, El DNI es obligatorio");
+        if (string.IsNullOrWhiteSpace(user.Name))
+            ModelState.AddModelError("Nombre", "Error, El nombre es obligatorio");
+        if (string.IsNullOrWhiteSpace(user.Surname))
+            ModelState.AddModelError("Apellidos", "Error, Los apellidos son obligatorios");
+        if (string.IsNullOrWhiteSpace(user.PhoneNumber))
+            ModelState.AddModelError("Telefono", "Error, El teléfono de contacto es obligatorio");
+    }
+
+    if (ModelState.ErrorCount > 0)
+        return BadRequest(new ValidationProblemDetails(ModelState));
+
+    // Cargamos los materiales con su tipo de material y tipo de deporte
+    var materialesIds = alquilerForCreate.Materiales.Select(m => m.MaterialId).ToList();
+    var materiales = await _context.Materials
+        .Include(m => m.TipoMaterial)
+        .Include(m => m.TipoDeporte)
+        .Where(m => materialesIds.Contains(m.IdMaterial))
+        .ToListAsync();
+
+    // Validamos existencia, cantidad y stock de cada material
+    foreach (var item in alquilerForCreate.Materiales)
+    {
+        var material = materiales.FirstOrDefault(m => m.IdMaterial == item.MaterialId);
+        if (material == null)
+            ModelState.AddModelError("Materiales", $"Error, No existe el material con id {item.MaterialId}");
+        else if (item.Cantidad < 1)
+            ModelState.AddModelError("Materiales", $"Error, La cantidad de {material.Nombre} debe ser al menos 1");
+        else if (item.Cantidad > material.Cantidad)
+            ModelState.AddModelError("Materiales", $"Error, No hay suficientes unidades de {material.Nombre}");
+    }
+
+    if (ModelState.ErrorCount > 0)
+        return BadRequest(new ValidationProblemDetails(ModelState));
+
+    // Creamos el alquiler; el precio se calcula en el servidor
+var alquiler = new Alquiler(
+    user!,
+    alquilerForCreate.FechaAlquiler.Date,
+    0,                              // idAlquiler: lo genera la BBDD
+    new List<MaterialAlquilado>(),  // se rellena en el foreach
+    alquilerForCreate.MetodoPago,
+    0                               // precioTotal inicial, se recalcula después
+);
+
+foreach (var item in alquilerForCreate.Materiales)
+{
+    var material = materiales.First(m => m.IdMaterial == item.MaterialId);
+
+    var materialAlquilado = new MaterialAlquilado(
+        item.Cantidad,                                  // cantidad
+        alquilerForCreate.Descripcion ?? string.Empty,  // descripción opcional del cliente
+        material.IdMaterial,                            // idMaterial
+        0,                                              // idAlquiler: EF lo rellena por la relación
+        material.Precio * item.Cantidad                 // precio de la cantidad pedida
+    )
+    {
+        Material = material,
+        Alquiler = alquiler
+    };
+
+    alquiler.MaterialesAlquilados.Add(materialAlquilado);
+    material.Cantidad -= item.Cantidad; // descontamos stock
+}
+
+// PrecioTotal es int en tu entidad y Precio es decimal, por eso el cast
+alquiler.PrecioTotal = (int)alquiler.MaterialesAlquilados.Sum(ma => ma.Precio);
+_context.Add(alquiler);
+
+try
+{
+    await _context.SaveChangesAsync();
+}
+catch (Exception ex)
+{
+    _logger.LogError(ex.Message);
+    return Conflict("Error, Ha ocurrido un error al guardar el alquiler: " + ex.Message);
+}
+
+// DTO de respuesta con la misma estructura que tu GetAlquiler
+var detail = new MaterialAlquiladoDetailDTOs(
+    alquiler.IdAlquiler,
+    user!.Name,
+    user.Surname,
+    user.DNI,
+    user.Email,
+    user.PhoneNumber,
+    alquiler.FechaAlquiler,
+    alquiler.PrecioTotal,
+    alquiler.MetodoPago,
+    alquiler.MaterialesAlquilados
+        .Select(ma => new MaterialAlquiladoItemDTOs(
+            ma.Material.Nombre,
+            ma.Material.TipoMaterial.NombreTipoMaterial,
+            ma.Material.TipoDeporte.Nombre,
+            ma.Cantidad,
+            ma.Precio))
+        .ToList<MaterialAlquiladoItemDTOs>());
+
+return CreatedAtAction("GetAlquiler", new { id = alquiler.IdAlquiler }, detail);
+}
+            
     }
 }
