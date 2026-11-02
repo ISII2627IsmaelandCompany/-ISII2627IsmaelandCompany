@@ -184,8 +184,46 @@ public static void SeedTiposDeporteAndPistas(ApplicationDbContext dbcontext)
     }
 
     dbcontext.SaveChanges();
-
 }
+
+public static void SeedReservasAndPistasReservadas(ApplicationDbContext dbcontext)
+{
+    // Buscamos las dos pistas que creamos en el seed anterior (baloncesto y fútbol)
+    var cliente = dbcontext.Users.FirstOrDefault(u => u.Email == "peter@uclm.es");
+    // Buscamos las pistas deportivas ya creadas en el seed de tipo deporte y pistas
+    var pistaBaloncesto = dbcontext.Pistas.FirstOrDefault(p => p.NombrePista == "Pista de baloncesto");
+    var pistaFutbol = dbcontext.Pistas.FirstOrDefault(p => p.NombrePista == "Pista de futbol");
+
+    if (cliente != null && pistaBaloncesto != null && pistaFutbol != null && !dbcontext.Reservas.Any())//comprobamos q exista el cliente para hacer la reserva
+    {
+        // Creamos la reserva pasandole el objeto cliente 
+        var reserva = new Reserva(cliente,MetodoPago.Tarjeta,new DateTime(2026,11,02),26.00m);
+       
+        dbcontext.Reservas.Add(reserva);
+        dbcontext.SaveChanges(); // Guardamos para que la reserva obtenga su ID
+    
+        // 4. Creamos la primera pista reservada 
+        var pistaReservada1 = new PistaReservada(pistaBaloncesto,2,24.00)
+        {
+            Reserva = reserva,
+            IdReserva = reserva.Id,
+            Observaciones = "Sin observaciones",
+        };
+
+        // 5. Creamos la segunda pista reservada 
+        var pistaReservada2 = new PistaReservada(pistaFutbol,1,15.00)
+        {
+            Reserva = reserva,
+            IdReserva = reserva.Id,
+            Observaciones = "Reserva nocturna",
+        };
+    
+
+        dbcontext.PistaReservada.AddRange(pistaReservada1, pistaReservada2);
+        dbcontext.SaveChanges();
+    }
+}   
+
 //******************************************************************************************
 public static void SeedCompeticiones(ApplicationDbContext dbcontext)
 {
