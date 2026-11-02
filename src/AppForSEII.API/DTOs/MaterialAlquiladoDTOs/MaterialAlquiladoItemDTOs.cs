@@ -2,10 +2,12 @@ using System;
 
 namespace AppForSEII.API.DTOs.MaterialAlquiladoDTOs
 {
+    // DTO de cada material alquilado: una fila de la lista dentro del details
     public class MaterialAlquiladoItemDTOs
     {
-        public MaterialAlquiladoItemDTOs() { }
+        public MaterialAlquiladoItemDTOs() { }  // constructor vacío permite crear el objeto sin datos y rellenarlo después
 
+        // es el que se usa en el Select del controlador
         public MaterialAlquiladoItemDTOs(string nombreMaterial, string tipoMaterial, string tipoDeporte, int cantidad, decimal precio)
         {
             NombreMaterial = nombreMaterial;
@@ -33,6 +35,7 @@ namespace AppForSEII.API.DTOs.MaterialAlquiladoDTOs
         [Range(0,999.99)]   //Para poner un rango de precio
         public decimal Precio { get; set; }
 
+        // el equals define cuando dos DTOs son iguales
         public override bool Equals(object? obj)
         {
             return obj is MaterialAlquiladoItemDTOs dto &&
@@ -43,6 +46,7 @@ namespace AppForSEII.API.DTOs.MaterialAlquiladoDTOs
                    Precio == dto.Precio;
         }
 
+        // el GetHashCode siempre se sobrescribe junto a Equals, dos objetos iguales deben dar el mismo hash
         public override int GetHashCode()
         {
             return HashCode.Combine(NombreMaterial, TipoMaterial, TipoDeporte, Cantidad, Precio);
