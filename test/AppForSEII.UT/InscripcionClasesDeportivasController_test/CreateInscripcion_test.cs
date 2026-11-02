@@ -288,12 +288,10 @@ public async Task CreateInscripcion_Error_test(
     var controller = new InscripcionClasesDeportivasController(_context, logger);
 
     // ACT: ejecutamos el metodo POST con los datos de prueba
-// guardamos la fecha y hora antes de crear la inscripcion
 
 // ejecutamos el POST
 var result = await controller.CreateInscripcion(inscripcionDTO);
 
-// guardamos la fecha y hora despues de crear la inscripcion
     // ASSERT: comprobamos la respuesta
 
     // comprobamos que devuelve BadRequest (400)
@@ -307,7 +305,6 @@ var result = await controller.CreateInscripcion(inscripcionDTO);
 
     // comprobamos que aparece el mensaje de error esperado
     Assert.Contains(errorExpected, errores);
-    // comprobamos que la fecha de inscripcion se ha generado durante la ejecucion del POST
     
 }
 
