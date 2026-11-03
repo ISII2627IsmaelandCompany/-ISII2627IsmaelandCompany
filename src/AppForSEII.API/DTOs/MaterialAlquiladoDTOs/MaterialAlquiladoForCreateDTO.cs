@@ -58,19 +58,19 @@ namespace AppForSEII.API.DTOs.MaterialAlquiladoDTOs
         public string ClienteUserName { get; set; } = string.Empty; // correo del cliente
 
         [Required(ErrorMessage = "El DNI es obligatorio")]
-        public string DNI { get; set; } = string.Empty;
+        public string DNI { get; set; } = string.Empty;                 //DNI
 
         [Required(ErrorMessage = "El nombre es obligatorio")]
-        public string Nombre { get; set; } = string.Empty;
+        public string Nombre { get; set; } = string.Empty;              //nombre
 
         [Required(ErrorMessage = "Los apellidos son obligatorios")]
-        public string Apellidos { get; set; } = string.Empty;
+        public string Apellidos { get; set; } = string.Empty;           //apellidos
 
         [Required(ErrorMessage = "El teléfono es obligatorio")]
-        public string Telefono { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;     //numero de telefono
 
         [Required(ErrorMessage = "Debe introducir la fecha del alquiler")]
-        public DateTime FechaAlquiler { get; set; }
+        public DateTime FechaAlquiler { get; set; }        //fecha del alquiler
 
         [Required]
         public MetodoPago MetodoPago { get; set; } = MetodoPago.Tarjeta;

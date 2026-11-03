@@ -71,28 +71,28 @@ namespace AppForSEII.API.Controllers
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.Conflict)] // 409
         public async Task<ActionResult> CreateAlquiler(MaterialAlquiladoForCreateDTO alquilerForCreate)
         {
-            // Flujo alternativo 3: debe haber al menos un material
+            // flujo alternativo 3: debe haber al menos un material
             if (alquilerForCreate.Materiales.Count == 0)
                 ModelState.AddModelError("Materiales", "Error, Debe seleccionar al menos un material");
 
-            // No se puede repetir el mismo material
+            // no se puede repetir el mismo material
             if (alquilerForCreate.Materiales.GroupBy(m => m.MaterialId).Any(g => g.Count() > 1))
                 ModelState.AddModelError("Materiales", "Error, No se puede seleccionar el mismo material dos veces");
 
-            // Flujo alternativo 2: fecha anterior a la actual
+            // flujo alternativo 2: fecha anterior a la actual
             if (alquilerForCreate.FechaAlquiler.Date < DateTime.Today)
                 ModelState.AddModelError("FechaAlquiler", "Error, La fecha del alquiler no puede ser anterior a la fecha actual");
 
-            // Método de pago válido
+            // metodo de pago valido
             if (!Enum.IsDefined(alquilerForCreate.MetodoPago))
                 ModelState.AddModelError("MetodoPago", "Error, El método de pago seleccionado no es válido");
 
-            // Buscamos al usuario
+            // buscamos al usuario
             var user = _context.ApplicationUsers.FirstOrDefault(au => au.UserName == alquilerForCreate.ClienteUserName);
             if (user == null)
                 ModelState.AddModelError("ClienteUserName", "Error, El usuario no está registrado");
 
-            // Flujo alternativo 5: datos obligatorios del formulario (vienen en el DTO, no del perfil)
+            // flujo alternativo 5: datos obligatorios del formulario (vienen en el DTO, no del perfil)
             if (string.IsNullOrWhiteSpace(alquilerForCreate.DNI))
                 ModelState.AddModelError("DNI", "Error, El DNI es obligatorio");
             if (string.IsNullOrWhiteSpace(alquilerForCreate.Nombre))
@@ -105,7 +105,7 @@ namespace AppForSEII.API.Controllers
             if (ModelState.ErrorCount > 0)
                 return BadRequest(new ValidationProblemDetails(ModelState));
 
-            // Cargamos los materiales con su tipo de material y tipo de deporte
+            // cargamos los materiales con su tipo de material y tipo de deporte
             var materialesIds = alquilerForCreate.Materiales.Select(m => m.MaterialId).ToList();
             var materiales = await _context.Materials
                 .Include(m => m.TipoMaterial)
@@ -113,7 +113,7 @@ namespace AppForSEII.API.Controllers
                 .Where(m => materialesIds.Contains(m.IdMaterial))
                 .ToListAsync();
 
-            // Validamos existencia, cantidad y stock de cada material
+            // validamos existencia, cantidad y stock de cada material
             foreach (var item in alquilerForCreate.Materiales)
             {
                 var material = materiales.FirstOrDefault(m => m.IdMaterial == item.MaterialId);
@@ -128,7 +128,7 @@ namespace AppForSEII.API.Controllers
             if (ModelState.ErrorCount > 0)
                 return BadRequest(new ValidationProblemDetails(ModelState));
 
-            // Creamos el alquiler; el precio se calcula en el servidor
+            // creamos el alquiler; (el precio se calcula en el servidor)
             var alquiler = new Alquiler(
                 user!,
                 alquilerForCreate.FechaAlquiler.Date,
