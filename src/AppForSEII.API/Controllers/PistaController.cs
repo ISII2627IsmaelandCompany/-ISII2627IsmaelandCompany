@@ -21,7 +21,7 @@ namespace AppForSEII.API.Controllers
         [Route("[action]")]//indicar que la ruta de la acción se construye a partir del nombre del método. En este caso, la ruta sería /api/Pista/GetPistas
         [ProducesResponseType(typeof(IList<PistaDTO>), (int)HttpStatusCode.OK)]//cuando la operación tiene éxito, puede devolver un código HTTP 200 OK con lista de objetos PistaDTO
         [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]//si hay error de validación, puede devolver un 400 Bad Request con info del error
-        public async Task<ActionResult<IList<PistaDTO>>> GetPistas(string? tipoDeporte, DateTime from, DateTime to)//declara el método que busca las pistas. Task<...> es una operación que terminará en el futuro. ActionResult<IList<PistaDTO>>: indica que la respuesta puede contener una lista de DTOs o un resultado HTTP, ej: un error
+        public async Task<ActionResult<IList<PistaDTO>>> GetPistas(string? tipoDeporte, DateTime? from, DateTime? to)//declara el método que busca las pistas. Task<...> es una operación que terminará en el futuro. ActionResult<IList<PistaDTO>>: indica que la respuesta puede contener una lista de DTOs o un resultado HTTP, ej: un error
         {
             if (from != null && to != null && from > to) //comprueba que se hayan introducido 2 fechas y que from sea anterior que to
             {
@@ -40,7 +40,7 @@ namespace AppForSEII.API.Controllers
             .Include(p => p.PistasReservadas)//Join con las líneas de reserva como en el ejemplo de movies
             .ThenInclude(pr => pr.Reserva)//join con la reserva
             .Where(p=> p.Stock >0 && (tipoDeporte == null || p.TipoDeporte.Nombre.Equals(tipoDeporte))// para buscar la pista . el tipoDeporte == null es para si no se pone nada, permite  cualquiera. EL p.TipoDeporte.Nombre.Equals(TipoDeporte): es para si se pone nombre, comprueba que esté incluido el nombre del deporte.
-            && (p.PistasReservadas.Count(pr => pr.Reserva.FechaReserva.Date >= from && pr.Reserva.FechaReserva <= to) < p.Stock))//comprueba la disponibilidad de las pistas este dia
+            && (p.PistasReservadas.Count(pr => pr.Reserva.FechaReserva.Date >= from.Value.Date && pr.Reserva.FechaReserva.Date <= to.Value.Date) < p.Stock))//comprueba la disponibilidad de las pistas este dia
             .OrderBy(p=>p.NombrePista) //Ordena las pistas alfabéticamente por su nombre y ascendente
             .ThenBy(p=>p.Precio)//Si dos pistas tienen el mismo nombre, las ordena por el precio de menor a mayor
             .Select(p=> new PistaDTO(//Select() transforma cada entidad Pista en un nuevo objeto PistaDTO
