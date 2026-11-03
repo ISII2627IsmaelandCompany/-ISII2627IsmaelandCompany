@@ -32,15 +32,15 @@ namespace AppForSEII.API.Controllers
             }
 
             //Si no se asignan fechas, se asignan valores ppor defecto
-            from = from == null ? DateTime.Today.AddDays(1) : from;
-            to = to == null ? DateTime.Today.AddDays(2) : to;
+            DateTime fromDate = from  ?? DateTime.Today.AddDays(1);
+            DateTime toDate = to ?? DateTime.Today.AddDays(2);
 
         IList<PistaDTO> pistas = await _context.Set<Pista>() //IList<PistaDTO>declara la variable(pistas) que almacena la lista de DTOs. _context.Set<Pista>(): da el conjunto de entidades Pista que se consulta en la base de datos. await: espera a que termine la operación asíncrona.
             .Include(p=>p.TipoDeporte)  //para sacar el tipo de deporte
             .Include(p => p.PistasReservadas)//Join con las líneas de reserva como en el ejemplo de movies
             .ThenInclude(pr => pr.Reserva)//join con la reserva
             .Where(p=> p.Stock >0 && (tipoDeporte == null || p.TipoDeporte.Nombre.Equals(tipoDeporte))// para buscar la pista . el tipoDeporte == null es para si no se pone nada, permite  cualquiera. EL p.TipoDeporte.Nombre.Equals(TipoDeporte): es para si se pone nombre, comprueba que esté incluido el nombre del deporte.
-            && (p.PistasReservadas.Count(pr => pr.Reserva.FechaReserva.Date >= from.Value.Date && pr.Reserva.FechaReserva.Date <= to.Value.Date) < p.Stock))//comprueba la disponibilidad de las pistas este dia
+            && (p.PistasReservadas.Count(pr => pr.Reserva.FechaReserva.Date >= fromDate.Date && pr.Reserva.FechaReserva.Date <= toDate.Date) < p.Stock))//comprueba la disponibilidad de las pistas este dia
             .OrderBy(p=>p.NombrePista) //Ordena las pistas alfabéticamente por su nombre y ascendente
             .ThenBy(p=>p.Precio)//Si dos pistas tienen el mismo nombre, las ordena por el precio de menor a mayor
             .Select(p=> new PistaDTO(//Select() transforma cada entidad Pista en un nuevo objeto PistaDTO
