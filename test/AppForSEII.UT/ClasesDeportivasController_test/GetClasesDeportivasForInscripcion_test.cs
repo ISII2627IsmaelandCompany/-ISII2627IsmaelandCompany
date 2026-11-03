@@ -116,7 +116,7 @@ public static IEnumerable<object?[]> TestCasesFor_GetClasesDeportivasForInscripc
         new object?[] { null, null, null, clasesDTOsTC1 },//esperamos las 3 clases de deporte , por eso todo a null
         new object?[] { "Tenis", null, null, clasesDTOsTC2 },//esperamos la clase de tenis
         new object?[] { null, "Carlos", null, clasesDTOsTC3 },//filtramos por  monitor , resultado baloncesto
-        new object?[] { null, null, new DateTime(2026,11,6), clasesDTOsTC4 },//filtramos por fecha resultado clase de tenis
+        new object?[] { null, null, new DateTime(2026,11,6), clasesDTOsTC4 },//filtramos por fecha resultado futbol
         new object?[] {"Tenis", "Miguel",new DateTime(2026, 11, 7),clasesDTOsTC2}//filtramos por deporte, monitor y fecha a la vez , resultado  clase de tenis
     };
 
@@ -169,7 +169,15 @@ public async Task GetClasesDeportivasForInscripcion_OK_test(
     //si no son iguales la prueba falla
     var clasesActuales = Assert.IsType<List<ClaseDeportivaForInscripcionDTO>>(okResult.Value);
     //comparamos las clases
-    Assert.Equal(expectedClases, clasesActuales);
+    // comprobamos que las dos listas tienen el mismo numero de clases
+    Assert.Equal(expectedClases.Count, clasesActuales.Count);
+
+    // recorremos las clases para comprobar que coinciden
+    for (int i = 0; i < expectedClases.Count; i++)
+    {
+    // comparamos cada DTO esperado con el obtenido
+    Assert.True(expectedClases[i].Equals(clasesActuales[i]));
+    }
 }
 
 //metodo que prepara los casos que deben devolver NotFound
