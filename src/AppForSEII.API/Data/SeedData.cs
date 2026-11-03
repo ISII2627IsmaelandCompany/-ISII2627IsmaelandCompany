@@ -218,7 +218,7 @@ public static void SeedReservasAndPistasReservadas(ApplicationDbContext dbcontex
     if (cliente != null && pistaBaloncesto != null && pistaFutbol != null && !dbcontext.PistaReservada.Any())//comprobamos q exista el cliente para hacer la reserva
     {
         // Creamos la reserva pasandole el objeto cliente 
-        var reserva = new Reserva(cliente,MetodoPago.Tarjeta,new DateTime(2026,11,02),26.00m);
+        var reserva = new Reserva(cliente,MetodoPago.Tarjeta,new DateTime(2026,11,02),27.00m);
        
         dbcontext.Reservas.Add(reserva);
         dbcontext.SaveChanges(); // Guardamos para que la reserva obtenga su ID
@@ -231,7 +231,7 @@ public static void SeedReservasAndPistasReservadas(ApplicationDbContext dbcontex
             Reserva = reserva,
             IdReserva = reserva.Id,
             Cantidad = 2,
-            Precio = 12.00 * 2, // Precio unitario de la pista de baloncesto multiplicado por la cantidad
+            Precio = 12.00,
             Observaciones = "Reserva para entrenamiento de baloncesto",
         };
 
