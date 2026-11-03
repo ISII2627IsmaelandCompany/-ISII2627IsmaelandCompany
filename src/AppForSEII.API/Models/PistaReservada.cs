@@ -9,8 +9,6 @@ public class PistaReservada
     public int Cantidad { get; set; }
 
 
-    [Required]
-
   [StringLength(50, ErrorMessage = "EL comentario de observacion no puede ser más largo que 50 caracteres.", MinimumLength = 4)]    
     public string? Observaciones {get; set;}//la "?" para que pueda ser null porque son opcionales
 
