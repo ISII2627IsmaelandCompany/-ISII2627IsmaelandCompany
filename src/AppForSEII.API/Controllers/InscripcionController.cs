@@ -5,6 +5,7 @@ using System.Net;
 using Microsoft.EntityFrameworkCore;
 
 using AppForSEII.API.Models;
+using System.Linq.Expressions;
 namespace AppForSEII.API.Controllers
 {
     [Route("api/[controller]")]//ruta base del controlador
@@ -18,14 +19,15 @@ namespace AppForSEII.API.Controllers
         {
             _context = context;
             _logger = logger;
-        }
-
+            _logger.LogInformation("InscripcionesController initialized");
+            }
         [HttpGet]//acción para obtener las competiciones disponibles para la inscripción
         [Route("[action]")]//ruta de la acción
         [ProducesResponseType(typeof(IList<CompeticionForInscripcionDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ValidationProblemDetails), (int)HttpStatusCode.BadRequest)]//tipos de respuesta que puede devolver la acción
         public async Task<ActionResult> GetCompeticionesForInscripcion(string? nombre, string? tipoDeporte, DateTime? fromDate, DateTime? toDate)//acción para obtener las competiciones disponibles para la inscripción, con filtros opcionales por nombre, tipo de deporte y rango de fechas
         {
+            try{
             if (fromDate != null &&
                 toDate != null &&
                 fromDate > toDate)//comprueba si fromDate es posterior a toDate
@@ -79,8 +81,14 @@ namespace AppForSEII.API.Controllers
 
                 return BadRequest(new ValidationProblemDetails(ModelState));//devuelve un error 400 con los detalles del error si no hay plazas disponibles para la competición
             }
-            
+            _logger.LogInformation(                $"{DateTime.Now} Info: Se han obtenido {competiciones.Count} competiciones disponibles para la inscripción");
             return Ok(competiciones);//devuelve un código 200 con la lista de competiciones disponibles para la inscripción
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener las competiciones para la inscripción");
+                return StatusCode((int)HttpStatusCode.InternalServerError, "Error al obtener las competiciones para la inscripción");
+            }
         }
 
         [HttpGet]
