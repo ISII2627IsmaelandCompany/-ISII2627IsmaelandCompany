@@ -25,7 +25,7 @@ namespace AppForSEII.UT.MaterialAlquiladoController_test
             var raqueta = new TipoMaterial(1, "Raqueta");
 
             // Material: (cantidad en stock, idMaterial, nombre, precio)
-            // Se le asignan sus relaciones con TipoDeporte y TipoMaterial
+            // se le asignan sus relaciones con TipoDeporte y TipoMaterial
             var pala = new Material(10, 1, "Pala", 10m)
             {
                 TipoDeporte = padel,
@@ -37,7 +37,7 @@ namespace AppForSEII.UT.MaterialAlquiladoController_test
             var alquiler = new Alquiler(user, _fechaAlquiler, 1,
                                         new List<MaterialAlquilado>(),
                                         MetodoPago.Tarjeta, 20);
-            // El constructor de Alquiler usa DateTime.Now e ignora el parámetro de fecha,
+            // El constructor de Alquiler uso DateTime.Now e ignora el parámetro de fecha,
             // por eso la asignamos aquí para que sea la fecha fija de la prueba
             alquiler.FechaAlquiler = _fechaAlquiler;
 
@@ -69,7 +69,7 @@ namespace AppForSEII.UT.MaterialAlquiladoController_test
         [Trait("LevelTesting", "Unit Testing")]   // clasifica la prueba como unitaria
         public async Task GetMaterialAlquilado_Found_test()
         {
-            // Logger simulado. El controller lo necesita en su constructor
+            // logger simulado. El controller lo necesita en su constructor
             // porque lo usa dentro del método, pero aquí no nos interesa lo que registre.
             var mock = new Mock<ILogger<AlquileresController>>();
             ILogger<AlquileresController> logger = mock.Object;
