@@ -443,10 +443,16 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
 }
 
         public static void SeedUsers(UserManager<ApplicationUser> userManager, List<string> roles) {
+            Console.WriteLine("ENTRANDO EN SEEDUSERS");
             //first, it checks the user does not already exist in the DB
             if (userManager.FindByNameAsync("elena@uclm.es").Result == null) {//buscamos si elena  ya exites el username comprobando el correo
                 ApplicationUser user = new ApplicationUser("1", "Elena", "Navarro Martínez", "elena@uclm.es");//creamos un usuario
-                user.EmailConfirmed = true;//email=comfirmado //  id  nombre         apellidos        email
+                                                        //  id  nombre         apellidos        email 
+                user.DNI = "00000000T";
+                user.PhoneNumber = "600000001";
+                user.Age = 35;
+                user.Sex = "Mujer";
+                user.EmailConfirmed = true;//email=comfirmado 
 
                 var result = userManager.CreateAsync(user, "Password1234%");//crear usuario con esta contrasena
                 result.Wait();//esperar operacion  asincrona
@@ -461,6 +467,10 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
             if (userManager.FindByNameAsync("peter@uclm.es").Result == null) {
                 //A customer class has been defined because it has different attributes (purchase, rental, etc.)
                 ApplicationUser user = new ApplicationUser("3", "Peter", "Jackson", "peter@uclm.es");
+                user.DNI = "00000001R";
+                user.PhoneNumber = "600000003";
+                user.Age = 30;
+                user.Sex = "Hombre";
                 user.EmailConfirmed = true;
 
                 var result = userManager.CreateAsync(user, "OtherPass12$");
@@ -473,6 +483,56 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
 
                 }
             }
+            // completar los datos de los usuarios que ya existen en la base de datos
+            //los metemos asi porque  seedUsers  solo crea si  todavia no existen
+            //recorremos los usuarios con  sus datos
+            foreach (var (email, dni, telefono, edad, sexo) in new[]
+            {
+            ("elena@uclm.es", "00000000T", "600000001", 35, "Mujer"),
+            ("peter@uclm.es", "00000001R", "600000003", 30, "Hombre")
+        })
+{//bucamos al usuario meduante su nombre de usuario (email)
+    var usuario = userManager.FindByNameAsync(email).Result;
+//comprobamos que  existe
+    if (usuario != null)
+    {
+        bool modificado = false;//para saber  si hemos modificado
+
+        if (string.IsNullOrWhiteSpace(usuario.DNI))//si el dni esta vacio o es null, le asignamos el dni 
+        {
+            usuario.DNI = dni;
+            modificado = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(usuario.PhoneNumber))//si el telefono esta vacio o  es null le asignagos el telefono
+        {
+            usuario.PhoneNumber = telefono;
+            modificado = true;
+        }
+
+        if (usuario.Age <= 0)//si la edad es 0  o  negativa le asignamos una  edad valida
+        {
+            usuario.Age = edad;
+            modificado = true;
+        }
+
+        if (string.IsNullOrWhiteSpace(usuario.Sex))//si el sexo  esta vacio o null lo completamos
+        {
+            usuario.Sex = sexo;
+            modificado = true;
+        }
+
+        if (modificado)//si  hemos modificado algo entra aqui
+        {// guardamos los nuevos datos utilizando UserManager de ASP.NET Identity
+            var resultado = userManager.UpdateAsync(usuario).Result;
+            Console.WriteLine($"Actualizando {email}: {resultado.Succeeded}");
+
+            if (!resultado.Succeeded) // si la actualización falla lanzamos una excepción indicando el usuario
+                throw new InvalidOperationException(
+                    $"No se pudo actualizar el perfil de {email}");
+        }
+    }
+}
 
         }
 
