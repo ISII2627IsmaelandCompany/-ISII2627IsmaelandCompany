@@ -45,7 +45,7 @@ namespace AppForSEII.UT.Inscripciones_Test
                 100,
                 15m
             );
-            
+
             // Act
             // Llamamos al método GetCompeticionesForInscripcion con todos los parámetros nulos para obtener todas las competiciones
             var result = await controller.GetCompeticionesForInscripcion(
@@ -91,5 +91,32 @@ namespace AppForSEII.UT.Inscripciones_Test
             // Comprobamos que el error corresponde al rango de fechas
             Assert.Contains("fromDate&toDate", validationProblem.Errors.Keys);
         }
+        [Fact]
+        [Trait("LevelTesting", "Unit Testing")]
+        [Trait("Database", "WithoutFixture")]
+        public async Task GetCompeticionesForInscripcion_NoPlazasDisponibles_test()
+        {
+            // Arrange
+            var mock = new Mock<ILogger<InscripcionesController>>();
+            ILogger<InscripcionesController> logger = mock.Object;
+            // Creamos el controlador con el contexto y el logger
+            var controller = new InscripcionesController(_context, logger);
+
+            // Act: Llamamos al método GetCompeticionesForInscripcion con plazasDisponibles = true
+            var result = await controller.GetCompeticionesForInscripcion(
+                null,
+                null,
+                new DateTime(2026, 11, 11),
+                null);
+
+            // Assert
+            // Comprobamos que devuelva un resultado 200 OK
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            // Comprobamos que el valor devuelto sea una lista de CompeticionForInscripcionDTO
+            var competicionesActuales =
+             Assert.IsType<ValidationProblemDetails>(badRequestResult.Value);
+            // Comprobamos que la lista devuelta esté vacía ya que no hay competiciones con plazas disponibles
+            Assert.Contains("Plazas", competicionesActuales.Errors.Keys);        }
     }
+
 }
