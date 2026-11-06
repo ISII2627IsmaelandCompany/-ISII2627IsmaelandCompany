@@ -21,9 +21,11 @@ public CreateInscripcion_test()
         "peter@uclm.es"   // nombre de usuario
     );
 
-    // asignamos su DNI
+    // datos personales del usuario 
     user.DNI = "12345678Z";
-
+    user.PhoneNumber = "600123456";
+    user.Age = 30;
+    user.Sex = "Hombre";
     // añadimos el usuario a la base de datos SQLLITE de pruebas
     _context.ApplicationUsers.Add(user);
     // creamos dos tipos de deporte
@@ -378,7 +380,7 @@ var expectedInscripcion = new InscripcionClaseDeportivaDetailDTO(
     "Jackson",                            // apellidos
     "12345678Z",                          // DNI
     "peter@uclm.es",                      // correo
-    null,                                 // telefono
+    "600123456",                                 // telefono
     inscripcionActual.FechaInscripcion,   // fecha generada por el servidor
     16m,                                  // precio total
     MetodoPago.Tarjeta,                   // metodo de pago
