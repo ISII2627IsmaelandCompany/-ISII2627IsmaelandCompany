@@ -416,7 +416,7 @@ namespace AppForSEII.API.Migrations
                     IdPista = table.Column<int>(type: "int", nullable: false),
                     IdReserva = table.Column<int>(type: "int", nullable: false),
                     Cantidad = table.Column<int>(type: "int", nullable: false),
-                    Observaciones = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Observaciones = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Precio = table.Column<double>(type: "float(5)", precision: 5, scale: 2, nullable: false),
                     ReservaId = table.Column<int>(type: "int", nullable: false)
                 },
