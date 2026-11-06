@@ -27,14 +27,14 @@ namespace AppForSEII.API.Controllers
         {
             var alquiler = await _context.Alquileres
             .Where(a => a.IdAlquiler == id) // filtra por el id del alquiler
-            .Include(a => a.Cliente) // relación alquiler - ApplicationUser
+            .Include(a => a.Cliente) // relación Alquiler con ApplicationUser
             .Include(a => a.MaterialesAlquilados)  // carga la lista de materiales alquilados de este alquiler
-                .ThenInclude(ma => ma.Material)   // y, de cada uno, el Material al que se refiere
-                    .ThenInclude(m => m.TipoMaterial)  // y, de cada Material, su TipoMaterial (balones o raquetas)
+                .ThenInclude(ma => ma.Material)   // y el Material al que se refiere
+                    .ThenInclude(m => m.TipoMaterial)  // de cada Material su TipoMaterial
             .Include(a => a.MaterialesAlquilados)  // se repite el Include para abrir otra rama del árbol de relaciones
                 .ThenInclude(ma => ma.Material)
-                    .ThenInclude(m => m.TipoDeporte)  // y, de cada Material, su TipoDeporte (baloncesto o tenis)
-            // Select proyecta la entidad en un DTO, así solo enviamos los datos necesarios
+                    .ThenInclude(m => m.TipoDeporte)  // y de cada Material su TipoDeporte
+            // Select proyecta la entidad en el DTO, solo enviamos los datos necesarios
             .Select(a => new MaterialAlquiladoDetailDTOs(
                 a.IdAlquiler,
                 a.Cliente.Name,
@@ -92,7 +92,7 @@ namespace AppForSEII.API.Controllers
             if (user == null)
                 ModelState.AddModelError("ClienteUserName", "Error, El usuario no está registrado");
 
-            // flujo alternativo 5: datos obligatorios del formulario (vienen en el DTO, no del perfil)
+            // flujo alternativo 5: datos obligatorios del formulario 
             if (string.IsNullOrWhiteSpace(alquilerForCreate.DNI))
                 ModelState.AddModelError("DNI", "Error, El DNI es obligatorio");
             if (string.IsNullOrWhiteSpace(alquilerForCreate.Nombre))
@@ -142,17 +142,12 @@ namespace AppForSEII.API.Controllers
             {
                 var material = materiales.First(m => m.IdMaterial == item.MaterialId);
 
-                var materialAlquilado = new MaterialAlquilado(
-                    item.Cantidad,                                  // cantidad
-                    alquilerForCreate.Descripcion ?? string.Empty,  // descripción opcional del cliente
-                    material.IdMaterial,                            // idMaterial
-                    0,                                              // idAlquiler: EF lo rellena por la relación
-                    material.Precio * item.Cantidad                 // precio de la cantidad pedida
-                )
-                {
-                    Material = material,
-                    Alquiler = alquiler
-                };
+                var descripcion = alquilerForCreate.Descripcion ?? string.Empty;
+                var precioLinea = material.Precio * item.Cantidad;
+
+                var materialAlquilado = new MaterialAlquilado(item.Cantidad, descripcion, material.IdMaterial, 0, precioLinea);
+                materialAlquilado.Material = material;
+                materialAlquilado.Alquiler = alquiler;
 
                 alquiler.MaterialesAlquilados.Add(materialAlquilado);
                 material.Cantidad -= item.Cantidad; // descontamos stock
@@ -172,7 +167,7 @@ namespace AppForSEII.API.Controllers
                 return Conflict("Error, Ha ocurrido un error al guardar el alquiler: " + ex.Message);
             }
 
-            // DTO de respuesta: datos del formulario + email del usuario
+            // DTO de respuesta datos del formulario y email del usuario
             var detail = new MaterialAlquiladoDetailDTOs(
                 alquiler.IdAlquiler,
                 alquilerForCreate.Nombre,
