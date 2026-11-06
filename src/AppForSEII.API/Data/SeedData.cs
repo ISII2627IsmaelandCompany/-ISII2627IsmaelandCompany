@@ -443,7 +443,6 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
 }
 
         public static void SeedUsers(UserManager<ApplicationUser> userManager, List<string> roles) {
-            Console.WriteLine("ENTRANDO EN SEEDUSERS");
             //first, it checks the user does not already exist in the DB
             if (userManager.FindByNameAsync("elena@uclm.es").Result == null) {//buscamos si elena  ya exites el username comprobando el correo
                 ApplicationUser user = new ApplicationUser("1", "Elena", "Navarro Martínez", "elena@uclm.es");//creamos un usuario
@@ -454,13 +453,15 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
                 user.Sex = "Mujer";
                 user.EmailConfirmed = true;//email=comfirmado 
 
-                var result = userManager.CreateAsync(user, "Password1234%");//crear usuario con esta contrasena
-                result.Wait();//esperar operacion  asincrona
+            // Creamos el usuario en la base de datos
+var result = userManager.CreateAsync(user, "Password1234%").Result;
 
-                if (result.IsCompletedSuccessfully) {//si se ha  creado correctamente
-                    //administrator role
-                    userManager.AddToRoleAsync(user, roles[0]).Wait();//le asignamos primer rol de la lista Administrador
-                }
+// Comprobamos que Identity haya creado correctamente el usuario
+if (result.Succeeded)
+{
+    // Le asignamos el rol de administrador
+    userManager.AddToRoleAsync(user, roles[0]).Wait();
+}
             }
 
                 //lo  mismo con  peter
@@ -525,7 +526,6 @@ public static void SeedTiposMaterialAndMateriales(ApplicationDbContext dbcontext
         if (modificado)//si  hemos modificado algo entra aqui
         {// guardamos los nuevos datos utilizando UserManager de ASP.NET Identity
             var resultado = userManager.UpdateAsync(usuario).Result;
-            Console.WriteLine($"Actualizando {email}: {resultado.Succeeded}");
 
             if (!resultado.Succeeded) // si la actualización falla lanzamos una excepción indicando el usuario
                 throw new InvalidOperationException(
