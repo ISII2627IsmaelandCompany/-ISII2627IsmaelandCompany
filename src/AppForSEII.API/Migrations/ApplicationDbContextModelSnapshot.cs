@@ -311,7 +311,6 @@ namespace AppForSEII.API.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Observaciones")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
