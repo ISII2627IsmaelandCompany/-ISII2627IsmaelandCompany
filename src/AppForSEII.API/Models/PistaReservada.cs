@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace AppForSEII.API.Models
 {
   [PrimaryKey(nameof(IdPista), nameof(IdReserva))]//PK compuesta como en el ejemplo de purchase-PURCHASEITEM-MOVIE
@@ -19,8 +21,10 @@ public class PistaReservada
     [Precision(5, 2)]
     public double Precio {get; set;}
 
+[ForeignKey(nameof(IdPista))]
 
     public Pista Pista {get; set;} = null!; //la relacion con la clase pista.
+    [ForeignKey(nameof(IdReserva))]
     public Reserva Reserva {get; set;} = null! ; //relacion con la clase reserva, una reserva puede tener mucha pistasReservadas
 
     [Required]
