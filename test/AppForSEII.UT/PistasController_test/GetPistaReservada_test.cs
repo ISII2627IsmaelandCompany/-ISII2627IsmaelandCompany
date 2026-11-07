@@ -116,7 +116,7 @@ var pistasEsperadas = new List<PistaReservadaItemDTO>();
             );
             
             // Act: buscamos la pista reservada con sus dos identificadores
-            var result = await controller.GetPistaReservada(1, 1); //el de pista y reserva
+            var result = await controller.GetPistaReservada(1); //el id de la reserva
 
             // Assert: comprobamos que devuelve 200 OK
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -141,8 +141,8 @@ var pistasEsperadas = new List<PistaReservadaItemDTO>();
             
             var controller = new PistaReservadaController(_context, logger);//creamos el controlador que vamos a probar
 
-        // Act: buscamos una pista reservada que no existe
-            var result = await controller.GetPistaReservada(0,0);
+        // Act: buscamos una  reserva que no existe
+            var result = await controller.GetPistaReservada(0);
 
         // Assert: comprobamos que devuelve 404 NotFound
             Assert.IsType<NotFoundResult>(result);

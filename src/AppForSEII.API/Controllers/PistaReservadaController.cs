@@ -1,7 +1,10 @@
 using AppForSEII.API.DTOs.PistaReservadaDTOs;//Importar dto del details de  pista reservada
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SQLitePCL;
+using Microsoft.EntityFrameworkCore;
+using AppForSEII.API.Data;
+using AppForSEII.API.Models;
+using System.Net;
 
 namespace AppForSEII.API.Controllers
 {
@@ -25,26 +28,40 @@ namespace AppForSEII.API.Controllers
         [ProducesResponseType(typeof(PistaReservadaDetailDTO), (int)HttpStatusCode.OK)]//todo correcto devuelve 200 OK e informacion
         [ProducesResponseType((int)HttpStatusCode.NotFound)]//va mal = 404 not found
 
-        public async Task<ActionResult> GetPistaReservada(int idPista, int idReserva)//id de la reserva a consultar, la recibe por parametro
+        public async Task<ActionResult> GetPistaReservada( int idReserva)//id de la reserva a consultar, la recibe por parametro
         {
             
-            var Pistareservada=await _context.PistaReservada
-            .Where(pr => pr.IdPista == idPista && pr.IdReserva == idReserva)//filtra hasta encontrar esa id
-        .Include (pr => pr.Pista)// Cargamos el cliente de esta reserva
-        .ThenInclude(p => p.TipoDeporte)// Para cada pista cargamos su tipo de deporte
-            .Include(pr => pr.Reserva)//para cada pista reservada cargamos la reserva
-            .ThenInclude(r => r.Cliente)//para cada reserva cargamos el cliente
-        .Include(pr => pr.Reserva)
-        .ThenInclude(r => r.PistasReservadas)//para cada reserva cargamos las pistas reservadas
-        .ThenInclude(pRes => pRes.Pista)//para cada pista reservada cargamos la pista
-        .ThenInclude(p => p.TipoDeporte)//para cada pista cargamos el tipo de deporte
+            var Pistareservada=await _context.Reservas
+            .Where(r => r.Id == idReserva)//filtra hasta encontrar esa id
+         .Include(r => r.Cliente)// Cargamos el cliente de esta reserva
+         .Include(r => r.PistasReservadas)//cargamos las pistas reservdas de esta reserva
+        .ThenInclude(pr => pr.Pista)//y la ppista a la que se refieren
+        .ThenInclude(p => p.TipoDeporte) //y de cada pista su tipo de deporte
             //dto que queremos devolver al cliente
-    .Select(pr => new PistaReservadaDetailDTO(pr.Reserva.Id,pr.Reserva.Cliente.Name,pr.Reserva.Cliente.Surname,pr.Reserva.Cliente.DNI, pr.Reserva.Cliente.Email,pr.Reserva.Cliente.PhoneNumber,pr.Reserva.FechaReserva,pr.Reserva.PrecioTotal,pr.Reserva.MetodoPago,
-    pr.Reserva.PistasReservadas.Select(pRes => new PistaReservadaItemDTO(pRes.IdPista,pRes.Pista.NombrePista,pRes.Pista.TipoDeporte.Nombre,pRes.Observaciones,pRes.Precio,pRes.Cantidad)).ToList())).FirstOrDefaultAsync();
+.Select(r => new PistaReservadaDetailDTO(
+    r.Id,
+    r.Cliente.Name,
+    r.Cliente.Surname,
+    r.Cliente.DNI,
+    r.Cliente.Email,
+    r.Cliente.PhoneNumber,
+    r.FechaReserva,
+    r.PrecioTotal,
+    r.MetodoPago,
+    r.PistasReservadas.Select(pRes =>new PistaReservadaItemDTO(//cada línea se convierte en un DTO "item"
+            pRes.IdPista,
+            pRes.Pista.NombrePista,
+            pRes.Pista.TipoDeporte.Nombre,
+            pRes.Observaciones,
+            pRes.Precio,
+            pRes.Cantidad
+        )).ToList()
+))
+.FirstOrDefaultAsync();/// devuelve el primero o null si no hay ninguno consulta la bbdd
           
     if (Pistareservada == null)            
     {
-        _logger.LogError($"No se ha encontrado la pista reservada con  con id IdPista {idPista} e IdReserva {idReserva}");
+_logger.LogError($"No se ha encontrado la reserva con id {idReserva}");
         return NotFound();
     }
 
@@ -191,7 +208,7 @@ catch (Exception ex)
                 reserva.MetodoPago,
             // creamos la lista del resumen con los datos reales de las  pistas reservadas que se han guardado en la base de datos
                 reserva.PistasReservadas
-             .Select(pr => new PistaReservadaItemDTO(
+             .Select(pr => new PistaReservadaItemDTO(//// cada línea se convierte en un DTO "item"
                         pr.Pista.IdPista,       //id
                         pr.Pista.NombrePista,//nombre
                         pr.Pista.TipoDeporte.Nombre,    //tipo de deporte
@@ -204,7 +221,7 @@ catch (Exception ex)
         // devolvemos 201 Created y el detalle de la reserva
         return CreatedAtAction(
         "GetPistaReservada",//nombre del metodo que devuelve la reserva creada
-        new { idPista = reserva.PistasReservadas.First().IdPista, idReserva = reserva.Id },//parametros que necesita el metodo Get para devolver la reserva creada
+        new {idReserva = reserva.Id },//parametros que necesita el metodo Get para devolver la reserva creada
         reservaDetail
         );}
     }   
