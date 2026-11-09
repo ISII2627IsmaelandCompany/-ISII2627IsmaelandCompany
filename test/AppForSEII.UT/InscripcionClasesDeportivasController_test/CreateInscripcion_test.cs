@@ -59,8 +59,30 @@ var claseTenis = new ClaseDeportiva(
     12m
 );
 
+var claseBaloncesto2 = new ClaseDeportiva(
+    "Entrenamiento de baloncesto Remota",       // descripcion
+    baloncesto,                          // tipo de deporte
+    new DateTime(2026, 11, 5, 18, 0, 0), // fecha y hora
+    "Pabellon deportivo",                // lugar
+    "Carlos",                            // monitor
+    "Principiante",                      // nivel
+    5,                                   // plazas disponibles
+    8m                                   // precio por plaza
+);
+var claseBaloncesto3 = new ClaseDeportiva(
+    "Entrenamiento de baloncesto Online",       // descripcion
+    baloncesto,                          // tipo de deporte
+    new DateTime(2026, 11, 5, 18, 0, 0), // fecha y hora
+    "Pabellon deportivo",                // lugar
+    "Carlos",                            // monitor
+    "Principiante",                      // nivel
+    5,                                   // plazas disponibles
+    8m                                   // precio por plaza
+);
+
+
 // añadimos los deportes y las clases a SQLite
-_context.AddRange(baloncesto, tenis, claseBaloncesto, claseTenis);
+_context.AddRange(baloncesto, tenis, claseBaloncesto, claseTenis,claseBaloncesto2,claseBaloncesto3);
 
 // guardamos los datos de prueba
 _context.SaveChanges();
@@ -265,6 +287,59 @@ allTests.Add(new object[]
     pagoInvalido,
     "Error, El metodo de pago seleccionado no es valido"
 });
+
+// creamos una inscripcion con un metodo de pago que no existe
+var descripcioninvalida = new InscripcionClaseDeportivaForCreateDTO(
+    "peter@uclm.es",             // usuario existente
+    "Tarjeta terminada en 1234", // datos del pago
+    MetodoPago.Bizum,             // metodo de pago invalido
+    new List<InscripcionClaseDeportivaItemDTO>()
+    {
+        new InscripcionClaseDeportivaItemDTO(
+            4,                                    // id de baloncesto
+            "Entrenamiento de baloncesto Online",        // descripcion
+            "Baloncesto",                         // deporte
+            new DateTime(2026, 11, 5, 18, 0, 0), // fecha y hora
+            1,                                    // plazas reservadas
+            8m,                                   // precio
+            null                                  // sin observaciones
+        )
+    }
+);
+
+// añadimos el caso y el mensaje de error esperado
+allTests.Add(new object[]
+{
+    descripcioninvalida,
+    "Error: el tipo de clase deportiva seleccionada no esta soportando en el sistema"
+});
+var descripcioninvalida2 = new InscripcionClaseDeportivaForCreateDTO(
+    "peter@uclm.es",             // usuario existente
+    "Tarjeta terminada en 1234", // datos del pago
+    MetodoPago.Bizum,             // metodo de pago invalido
+    new List<InscripcionClaseDeportivaItemDTO>()
+    {
+        new InscripcionClaseDeportivaItemDTO(
+            3,                                    // id de baloncesto
+            "Entrenamiento de baloncesto Remota",        // descripcion
+            "Baloncesto",                         // deporte
+            new DateTime(2026, 11, 5, 18, 0, 0), // fecha y hora
+            1,                                    // plazas reservadas
+            8m,                                   // precio
+            null                                  // sin observaciones
+        )
+    }
+);
+
+// añadimos el caso y el mensaje de error esperado
+allTests.Add(new object[]
+{
+    descripcioninvalida2,
+    "Error: el tipo de clase deportiva seleccionada no esta soportando en el sistema"
+});
+
+
+
 
     // devolvemos los casos que utilizara nuestra prueba
     return allTests;
