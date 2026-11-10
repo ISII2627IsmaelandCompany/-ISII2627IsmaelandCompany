@@ -25,7 +25,7 @@ public class RabbitMQLogger : ILogger, IDisposable
         _connection = await factory.CreateConnectionAsync();
         _channel = await _connection.CreateChannelAsync();
 
-        _channel.ExchangeDeclareAsync(exchange: _config.Exchange,
+       await _channel.ExchangeDeclareAsync(exchange: _config.Exchange,
         type: _config.ExchangeType,
         durable: _config.Durable);
 
@@ -43,6 +43,7 @@ public class RabbitMQLogger : ILogger, IDisposable
             Persistent = _config.Durable,
             ContentType = "application/json"
         };
+           InitializateAsync().GetAwaiter().GetResult();
     }
 
     private static void ValidateConfiguration(RabbitMQLoggerConfiguration config)
@@ -93,7 +94,7 @@ public class RabbitMQLogger : ILogger, IDisposable
             routingKey: "", 
             mandatory: false, 
             basicProperties: _properties, 
-            body: body);
+            body: body).GetAwaiter().GetResult();
 
 
         }

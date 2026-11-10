@@ -22,7 +22,7 @@ namespace AppForSEII.API.Controllers//sitio  donde esta el controlador
 [ProducesResponseType(typeof(IList<ClaseDeportivaForInscripcionDTO>), (int)HttpStatusCode.OK)]//si todo va correcto devuelve lista de ClaseDeportivaForInscripcionDto
 [ProducesResponseType((int)HttpStatusCode.NotFound)]
 public async Task<ActionResult> GetClasesDeportivasForInscripcion(string? tipoDeporte,string? monitor,DateTime? fecha){ 
-
+_logger.LogInformation("Iniciando búsqueda de clases deportivas");
     IList<ClaseDeportivaForInscripcionDTO> clases = await _context.ClasesDeportivas//consultar  clase deportivas  de la base  de datos
 
         .Include(c => c.TipoDeporte)//carga informacion relaciona de tipodeporte para devolver su nombre
@@ -41,9 +41,10 @@ public async Task<ActionResult> GetClasesDeportivasForInscripcion(string? tipoDe
         .ToListAsync();//convertimos resultado en  una lista
         //flujo alternativo 0 si no hay plazas para lo que busca el cliente se notifica
         if (clases.Count == 0){
+                _logger.LogWarning("No se encontraron clases deportivas con plazas disponibles");
     return NotFound("No se han encontrado clases deportivas con plazas disponibles");}
 
-
+_logger.LogInformation("Búsqueda completada. Se encontraron {Cantidad} clases deportivas", clases.Count);
     return Ok(clases);}
     }
 
