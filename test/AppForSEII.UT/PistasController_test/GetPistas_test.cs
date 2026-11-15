@@ -39,15 +39,15 @@ namespace AppForSEII.UT.PistasController_test;
             //creo las reservas 
             var reservas = new List<Reserva>()
             {                         //el date time: año, mes, dia, hora, minutos y segundos. El 12 es el precio
-                new Reserva(usuario, MetodoPago.Tarjeta, new DateTime(2026, 11, 10, 10, 0, 0), 12.00m),
+                 new Reserva(usuario, MetodoPago.Tarjeta, DateTime.Today.AddDays(1), 12.00m),
 
-                new Reserva(usuario, MetodoPago.Efectivo, new DateTime(2026,11, 11, 10, 0, 0), 15.00m),
+                new Reserva(usuario, MetodoPago.Efectivo, DateTime.Today.AddDays(2), 15.00m),
 
                 new Reserva()//es lo mismo
                 {
                     Cliente = usuario,
                     MetodoPago = MetodoPago.Bizum,
-                    FechaReserva = new DateTime(2026, 11, 10, 12, 0, 0),
+                    FechaReserva = DateTime.Today.AddDays(1),
                     PrecioTotal = 10.00m
                 }                
             };
@@ -65,9 +65,9 @@ namespace AppForSEII.UT.PistasController_test;
              //creo las pistas reservadas dejajo para que reciban los identificadores reales (y no valores 0 que pdrian tener)
             var pistasReservadas = new List<PistaReservada>()
             {//El constructor de PistaReservada: PistaReservada(Pista pista, Reserva reserva, int cantidad, double precio)
-                new PistaReservada(pistas[0], reservas[0], 1, 12.00),//pista baloncesto reservada el 10 de noviembre, cantidad 1, precio 12
-                new PistaReservada(pistas[1], reservas[1], 1, 15.00),//pista futbol reservada el 11 de noviembre, cantidad 1, precio 15
-                new PistaReservada(pistas[2], reservas[2], 1, 10.00)//pista tenis reservada el 10 de noviembre, cantidad 1, precio 10
+                new PistaReservada(pistas[0], reservas[0], 1, 12.00),//pista baloncesto reservada mañana, preio 12$
+                new PistaReservada(pistas[1], reservas[1], 1, 15.00),//pista futbol reservada  pasado mañana cantidad 1, precio 15
+                new PistaReservada(pistas[2], reservas[2], 1, 10.00)//pista tenis reservada mañana, cantidad 1, precio 10
             };
             _context.AddRange(pistasReservadas);
             _context.SaveChanges();
@@ -93,38 +93,37 @@ public static IEnumerable<object?[]> TestCasesFor_GetPistas_OK()
 
     // caso 1 ->sin filtros, buscamos todas las pistas disponibles 
     var pistasDTOsTC1 = new List<PistaDTO>()
-    {pistasDTOs[0], pistasDTOs[1], pistasDTOs[2]};//baloncesto futbol y tenis , ordenadas por la  fecha
+    {pistasDTOs[1]};//Solo fútbol, porque es la única disponible
 
     // caso 2 ->filtro por deporte(tenis )
     var pistasDTOsTC2 = new List<PistaDTO>()
     { pistasDTOs[2] };// solo debe aparecer la unica pista de tenis con stock
     
-    // caso 3 filtro por fecha, el 10 de noviembre
+    // caso 3 filtro por fecha, mañana
     var pistasDTOsTC3 = new List<PistaDTO>()
-    { pistasDTOs[1] };// fútbol no tiene reserva el día 10, las otras ya están reservadas
-
-    // caso 4 filtro por fecha, el 11 de noviembre
+    { pistasDTOs[1] };
+    // caso 4 filtro por fecha,, pasado mañana
     var pistasDTOsTC4 = new List<PistaDTO>()
-    { pistasDTOs[0], pistasDTOs[1], pistasDTOs[2] };//baloncesto no tiene reserva el 11, fultbol si tiene reserva pero su strok =2, tenis no tiene reserva el 11  y la de tenis sin stock no se devuelve nunca
+    { pistasDTOs[0], pistasDTOs[1], pistasDTOs[2] };// filtro por fecha, pasado mañana
 
-// caso 5 voy a filtrar por un intervalo de fechas, del 10 al 11 de noviembre
+// caso 5 voy a filtrar por un intervalo de fechas,desde mañana hasta pasado mañana
     var pistasDTOsTC5 = new List<PistaDTO>()
     { pistasDTOs[1] };
     /*
-El controlador comprueba cuántas reservas tiene cada pista entre el día 10 y el 11. La pista debe estar disponible todo el intervalo
-Baloncesto: tiene  reserva el día 10. su stock es 1, no está disponible para todo el intervalo.
-Fútbol: tiene  reserva el día 11.  su stock es 2, todavía queda una plaza disponible.
-Tenis: tiene  reserva el día 10.  su stock es 1, no está disponible para todo el intervalo.
+El controlador comprueba cuántas reservas tiene cada pista entre mañana y pasado mañana.
+Baloncesto: tiene una reserva mañana y su stock es 1, por lo que no está disponible.
+Fútbol: tiene una reserva pasado mañana, pero su stock es 2, por lo que todavía queda una plaza disponible.
+Tenis: tiene una reserva mañana y su stock es 1, por lo que no está disponible
 */
     // guardamos los filtros y los resultados esperados
     var allTests = new List<object?[]>
     {
          //cada array tiene 4 posiciones. 1-tipoDeporte, 2-from, 3-to y 4 -lista de DTOs esperados
-        new object?[] { null, null, null, pistasDTOsTC1 },//Todas las pistas disponibles
-        new object?[] { "Tenis", null, null, pistasDTOsTC2 },//filtro por tenis
-        new object?[] { null, new DateTime(2026,11,10), new DateTime(2026,11,10), pistasDTOsTC3 },// Pistas disponibles el día 10
-        new object?[] { null, new DateTime(2026,11,11), new DateTime(2026,11,11), pistasDTOsTC4 },// Pistas disponibles el día 11
-        new object?[] { null, new DateTime(2026,11,10), new DateTime(2026,11,11), pistasDTOsTC5 }// Pistas disponibles del 10 al 11
+        new object?[] { null, null, null, pistasDTOsTC1 },///Sin filtros, aplica las fechas por defecto
+        new object?[] { "Tenis", DateTime.Today.AddDays(2),DateTime.Today.AddDays(2), pistasDTOsTC2 },//filtro por tenis,  pasado mañana
+        new object?[] { null, DateTime.Today.AddDays(1),DateTime.Today.AddDays(1), pistasDTOsTC3 },// Buscar disponibilidad mañana
+        new object?[] { null, DateTime.Today.AddDays(2),DateTime.Today.AddDays(2), pistasDTOsTC4 },/// Buscar disponibilidad pasado mañana
+        new object?[] { null, DateTime.Today.AddDays(1),DateTime.Today.AddDays(2), pistasDTOsTC5 } // Buscar disponibilidad entre mañana y pasado mañana
     };
     
     return allTests;//devolvemos los cincos casos y estos se usaran para ejecutar  el Theory
@@ -198,8 +197,8 @@ public static IEnumerable<object?[]> TestCasesFor_GetPistas_BadRequest()
 
         // Caso 2: la fecha inicial es posterior a la fecha final
          // Debería devolver BadRequest
-        new object?[] { null, new DateTime(2026, 11, 12), new DateTime(2026, 11, 10)
-         }
+        new object?[] { null, DateTime.Today.AddDays(2), DateTime.Today.AddDays(1) }
+        
     };
 
     return allTests;//devolvemos los dos casos de error para usarlos en el Theory
