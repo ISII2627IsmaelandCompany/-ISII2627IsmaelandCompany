@@ -6,7 +6,7 @@ using AppForSEII.Web.Components;
 using AppForSEII.Web.Components.Account;
 using AppForSEII.Web.Data;
 using AppForSEII.Web.API;
-
+using AppForSEII.Web;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+    // Registramos el contenedor de estado para las inscripciones deportivas
+builder.Services.AddScoped<InscripcionClaseDeportivaStateContainer>();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityRedirectManager>();
