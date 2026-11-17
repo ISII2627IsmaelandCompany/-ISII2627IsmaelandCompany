@@ -12,34 +12,33 @@
     <h3>Inscribirse a clases deportivas</h3>
     <p>Selecciona las clases deportivas en las que deseas inscribirte.</p>
 
-    @* Filtros de búsqueda *@
     <div class="mb-3">
 
         <label class="form-label">Tipo de deporte</label>
-        <input class="form-control"
+        <input id="tipoDeporte" class="form-control"
                placeholder="Ej. Tenis"
                @bind="tipoDeporte" />
 
         <label class="form-label mt-2">Monitor</label>
-        <input class="form-control"
+        <input id="monitor" class="form-control"
                placeholder="Ej. Laura"
                @bind="monitor" />
 
         <label class="form-label mt-2">Fecha</label>
-        <input type="date"
+        <input id="fecha" type="date"
                class="form-control"
                @bind="fecha" />
 
-        <button class="btn btn-primary mt-3"
+        <button id="buscarClases"
+                class="btn btn-primary mt-3"
                 @onclick="BuscarClases">
             Buscar clases
         </button>
     </div>
 
-    @* Resultados de búsqueda *@
     @if (mensajeError != null)
     {
-        <div class="alert alert-warning">
+        <div class="alert alert-warning" id="mensajeError">
             @mensajeError
         </div>
     }
@@ -54,7 +53,7 @@
         <p>Clases encontradas: @clases.Count</p>
 
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="tablaClases">
                 <thead>
                     <tr>
                         <th>Descripción</th>
@@ -81,7 +80,8 @@
                             <td>@clase.PlazasDisponibles</td>
                             <td>@clase.PrecioUnitario.ToString("F2") €</td>
                             <td>
-                                <button class="btn btn-outline-primary btn-sm"
+                                <button id="anadirClase_@clase.Id"
+                                        class="btn btn-outline-primary btn-sm"
                                         disabled="@Estado.ClasesSeleccionadas.ContainsKey(clase.Id)"
                                         @onclick="() => Estado.AgregarClase(clase)">
                                     @(Estado.ClasesSeleccionadas.ContainsKey(clase.Id)
@@ -96,7 +96,6 @@
         </div>
     }
 
-    @* Carrito de inscripciones *@
     <div class="card mt-4">
         <div class="card-body">
 
@@ -111,7 +110,7 @@
             else
             {
                 <div class="table-responsive">
-                    <table class="table">
+                    <table class="table" id="tablaCarrito">
                         <thead>
                             <tr>
                                 <th>Clase</th>
@@ -135,7 +134,8 @@
                                     </td>
 
                                     <td>
-                                        <select class="form-select form-select-sm"
+                                        <select id="plazas_@item.ClaseDeportivaId"
+                                                class="form-select form-select-sm"
                                                 value="@item.PlazasReservadas"
                                                 @onchange="e => CambiarPlazas(item.ClaseDeportivaId, e)">
                                             @for (int n = 1; n <= Math.Min(3, claseOriginal.PlazasDisponibles); n++)
@@ -150,7 +150,8 @@
                                     </td>
 
                                     <td>
-                                        <button class="btn btn-outline-danger btn-sm"
+                                        <button id="eliminarClase_@item.ClaseDeportivaId"
+                                                class="btn btn-outline-danger btn-sm"
                                                 @onclick="() => Estado.EliminarClase(item.ClaseDeportivaId)">
                                             Eliminar
                                         </button>
@@ -172,17 +173,18 @@
                     </strong>
                 </p>
 
-                <button class="btn btn-outline-danger"
+                <button id="vaciarCarrito"
+                        class="btn btn-outline-danger"
                         @onclick="Estado.VaciarCarrito">
                     Vaciar carrito
                 </button>
             }
 
-            @* Continuar a los detalles de la inscripción *@
             <div class="mt-3">
-                <button class="btn btn-primary"
+                <button id="inscribirse"
+                        class="btn btn-primary"
                         disabled="@(Estado.Inscripcion.ClasesInscritas.Count == 0)"
-                        @onclick="IrADetalles">
+                        @onclick="IrACrearInscripcion">
                     Inscribirse
                 </button>
             </div>
@@ -193,24 +195,20 @@
 </div>
 
 @code {
-    // Clases obtenidas de la API
     private ICollection<ClaseDeportivaForInscripcionDTO> clases =
         new List<ClaseDeportivaForInscripcionDTO>();
 
-    // Filtros de búsqueda
     private string? tipoDeporte;
     private string? monitor;
     private DateTime? fecha;
 
     private string? mensajeError;
 
-    // Cargar las clases al abrir la página
     protected override async Task OnInitializedAsync()
     {
         await BuscarClases();
     }
 
-    // Buscar clases aplicando los filtros
     private async Task BuscarClases()
     {
         mensajeError = null;
@@ -240,7 +238,6 @@
         }
     }
 
-    // Modificar las plazas reservadas desde el carrito
     private void CambiarPlazas(int claseDeportivaId, ChangeEventArgs e)
     {
         if (int.TryParse(e.Value?.ToString(), out int plazas) &&
@@ -251,12 +248,11 @@
         }
     }
 
-   // Continuar a los detalles de la inscripción
-private void IrADetalles()
-{
-    if (Estado.Inscripcion.ClasesInscritas.Count > 0)
+    private void IrACrearInscripcion()
     {
-        Navegacion.NavigateTo("/inscripciones/clases/detalles");
+        if (Estado.Inscripcion.ClasesInscritas.Count > 0)
+        {
+            Navegacion.NavigateTo("/inscripciones/clases/crear");
+        }
     }
-}
 }
