@@ -6,7 +6,7 @@ using RabbitMQ.Client;
 
 namespace AppForSEII.API.Logging;
 
-//se conecta a RabbitMQ
+//se conecta a RabbitMQ. Construye y publica los mensajes en RabbitMQ
 public class RabbitMQLogger : ILogger, IDisposable //La declaración de la clase. ILogger: indica que nuestra clase implementa el sistema estándar de logs de .NET. - IDisposable: permite liberar los recursos utilizados cuando terminamos de trabajar con RabbitMQ.
 {
     private readonly string _name;//Nombre de la categoría del logger.
@@ -23,7 +23,7 @@ public class RabbitMQLogger : ILogger, IDisposable //La declaración de la clase
             UserName = _config.UserName,
             Password = _config.Password
         };
-        _connection = await factory.CreateConnectionAsync();//Creamos la conexión con RabbitMQ.
+        _connection = await factory.CreateConnectionAsync();//Creamos la conexión con RabbitMQ. el await es para esperar a que termine esta operación antes de continuar
         _channel = await _connection.CreateChannelAsync();//Creamos un canal dentro de esa conexión.
 
        await _channel.ExchangeDeclareAsync(exchange: _config.Exchange,
@@ -31,7 +31,7 @@ public class RabbitMQLogger : ILogger, IDisposable //La declaración de la clase
         durable: _config.Durable);
 /*declaramos el exchange.
 Un exchange es el componente de RabbitMQ que recibe los mensajes del productor y decide a qué colas enviarlos.
-un exchange de tipo fanout. significa que distribuye una copia del mensaje a cada cola que esté vinculada a él
+un exchange de tipo fanout significa que distribuye una copia del mensaje a cada cola que esté vinculada a él
 */
 
     }
@@ -51,7 +51,7 @@ un exchange de tipo fanout. significa que distribuye una copia del mensaje a cad
            InitializateAsync().GetAwaiter().GetResult();//ejecuta el método asíncrono de inicialización y espera a que termine.
     }
 
-    private static void ValidateConfiguration(RabbitMQLoggerConfiguration config)
+    private static void ValidateConfiguration(RabbitMQLoggerConfiguration config)//metodo que indica si la configuracion es válida o no
     {
         if (string.IsNullOrEmpty(config.HostName))//comprueba si HostName está vacío o es nulo
             throw new ArgumentException("RabbitMQ HostName is required", nameof(config));
@@ -61,7 +61,7 @@ un exchange de tipo fanout. significa que distribuye una copia del mensaje a cad
             throw new ArgumentException("RabbitMQ UserName is required", nameof(config));
         if (string.IsNullOrEmpty(config.Password))//no puede estar vacío.
             throw new ArgumentException("RabbitMQ Password is required", nameof(config));
-        if (string.IsNullOrEmpty(config.Exchange))//debe tener nombre
+        if (string.IsNullOrEmpty(config.Exchange))//no puede estar vacio
             throw new ArgumentException("RabbitMQ Exchange is required", nameof(config));
         if (string.IsNullOrEmpty(config.ExchangeType))//debe tener tipo.
             throw new ArgumentException("RabbitMQ ExchangeType is required", nameof(config));
@@ -71,7 +71,7 @@ un exchange de tipo fanout. significa que distribuye una copia del mensaje a cad
 
     public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;//Comprueba si el nivel del log está habilitado
 
-    public void Log<TState>(//este metodo se ejecuta cuando la aplicación quiere registrar un log.
+    public void Log<TState>(//este metodo se ejecuta cuando la aplicación quiere registrar un log. Un log es un registro de un acontecimiento que ocurre en una aplicación.
         LogLevel logLevel,
         EventId eventId,
         TState state,//Información asociada al mensaje.
@@ -83,8 +83,8 @@ un exchange de tipo fanout. significa que distribuye una copia del mensaje a cad
 
         try
         {//si el nivel si esta habilitado, construye el mensaje:
-            var logEntry = new
-            {//Aquí crea un objeto con toda la información del log.
+            var logEntry = new //logEntry es una variable que contiene toda la información de un log organizada en un objeto.
+            {
                 Timestamp = DateTime.UtcNow,
                 LogLevel = logLevel.ToString(),
                 Category = _name,
@@ -93,15 +93,17 @@ un exchange de tipo fanout. significa que distribuye una copia del mensaje a cad
                 Message = formatter(state, exception),
                 Exception = exception?.ToString()
             };
+            //Convertir el objeto logEntry en texto JSON y despues en bytes para enviarlo mediante RabbitMQ
             var message = JsonSerializer.Serialize(logEntry);//Convierte el objeto en una cadena JSON
             var body = Encoding.UTF8.GetBytes(message);//Convierte esa cadena JSON en bytes
 
-            _channel.BasicPublishAsync(//se envía el mensaje
+            _channel.BasicPublishAsync(//Esta instrucción es la que publica el mensaje en RabbitMQ EXCHANGE se encarga de recibir mensajes de los productores y repartirlos a las colas correspondientes. este exchange es fanout(envia a todas las colas). el exchange direct solo a las colas done el routing key coincide.
             exchange: _config.Exchange, //exchange al que enviamos el mensaje.
             routingKey: "", //clave de enrutamiento. En fanout se ignora.
             mandatory: false, //indica si RabbitMQ debe devolver el mensaje cuando no pueda enrutarlo
             basicProperties: _properties, //propiedades del mensaje
-            body: body).GetAwaiter().GetResult();//contenido del mensaje en bytes.
+            body: body)//contenido del mensaje en bytes.
+            .GetAwaiter().GetResult();//ilogger no es asíncrono, Esto obliga al código a esperar hasta que termine la operación de publicación.
 
 
         }
