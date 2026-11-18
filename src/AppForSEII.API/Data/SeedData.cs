@@ -1,6 +1,6 @@
 namespace AppForSEII.API.Data {
     public class SeedData {
-        public static void Initialize(ApplicationDbContext dbContext, IServiceProvider serviceProvider, ILogger logger) {
+        public static void Initialize(ApplicationDbContext dbContext, IServiceProvider serviceProvider, ILogger logger) {//ILogger es una interfaz de .NET para registrar logs y logger es el objeto que permite escribir esos registros
             List<string> rolesNames = new List<string> { "Administrator", "Employee", "Customer" };//roles de la aplicacion
 
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();//obtener RoleManager para crear y consultar roles del Identity
