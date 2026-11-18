@@ -1,12 +1,13 @@
-using AppForSEII.API.Logging;
+using AppForSEII.API.Logging;//Permite utilizar las clases de logging de RabbitMQ.
 using Microsoft.Data.Sqlite;
 using System.Data.Common;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);// Creamos el builder que configura y prepara la aplicación web
+// Añadimos el proveedor personalizado de logs de RabbitMQ
 builder.Logging.AddRabbitMQ(builder.Configuration.GetSection("RabbitMQ"));//”RabbiMQ” coincide con el nombre del bloque de propiedades en appsettings.json
+//builder.Logging accede al sistema de logs de .NET.
 // Add services to the container.
-
-builder.Services.AddControllers()
+builder.Services.AddControllers()//Registra los controladores que utiliza la API.
 //show definitions of enums as strings
 .AddJsonOptions(options => {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
