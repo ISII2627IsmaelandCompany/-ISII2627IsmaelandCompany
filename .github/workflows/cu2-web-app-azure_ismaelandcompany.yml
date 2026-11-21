@@ -7,6 +7,12 @@ on:
   push:
     branches:
       - 'CU2-Web-App-Azure'
+  pull_request:
+    branches:
+      - 'development'
+
+    types:
+      - closed
   workflow_dispatch:
 
 jobs:
@@ -50,6 +56,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
     runs-on: windows-latest
     needs: build
     permissions:
@@ -62,18 +69,19 @@ jobs:
         with:
           name: .net-app
       
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_25B3839B5CDE4F09990A0BA8FC753A5D }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8C593A1E427A491FA8625F368C9287F6 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A403804717EB48918706B82007E2CAEF }}
+      #- name: Login to Azure
+      #  uses: azure/login@v2
+      #  with:
+      #    client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_25B3839B5CDE4F09990A0BA8FC753A5D }}
+      #    tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8C593A1E427A491FA8625F368C9287F6 }}
+      #   subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A403804717EB48918706B82007E2CAEF }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'IsmaelandCompany'
-          slot-name: 'Production'
+          #slot-name: 'Production'
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_MARCO }}
           package: .
           
