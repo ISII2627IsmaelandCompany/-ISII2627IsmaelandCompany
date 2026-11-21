@@ -22,9 +22,9 @@ jobs:
 
     env:
       API: ./src/AppForSEII.API/AppForSEII.API.csproj
-      WEB: ./src/AppForSEII2526.Web/AppForSEII2526.Web.csproj
-      UT:  ./test/AppForSEII2526.UT/AppForSEII2526.UT.csproj
-      UIT: ./test/AppForSEII2526.UIT/AppForSEII2526.UIT.csproj
+      WEB: ./src/AppForSEII.Web/AppForSEII.Web.csproj
+      UT:  ./test/AppForSEII.UT/AppForSEII.UT.csproj
+      UIT: ./test/AppForSEII.UIT/AppForSEII.UIT.csproj
       
     steps:
       - name: Check out repository code just branch development
