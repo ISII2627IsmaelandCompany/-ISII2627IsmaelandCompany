@@ -1,40 +1,42 @@
-﻿
+﻿ 
 using Microsoft.Extensions.Configuration;
 
 namespace AppForSEII.LogViewer;
 
 internal class Program
-{
+{ // Método principal del programa. Es asíncrono , usa operaciones con await.
+// // Es el primer método que se ejecuta al iniciar la aplicación.
     static async Task Main(string[] args)
     {
         // Leemos la configuración desde appsettings.json
-        var config = new ConfigurationBuilder()
-            .SetBasePath(AppContext.BaseDirectory)
-            .AddJsonFile("appsettings.json", optional: false)
-            .Build();
+        var config = new ConfigurationBuilder()// Creamos el constructor de configuración para leer los datos de appsettings.json.
+            .SetBasePath(AppContext.BaseDirectory)// Indicamos que la ruta base para buscar los archivos sea el directorio desde el que se está ejecutando la aplicación.
+            .AddJsonFile("appsettings.json", optional: false)// Añadimos el archivo appsettings.json como fuente de configuración. el optional a false indica que el archivo tiene q existir obligatoriamente.
+            .Build();//construir y obtener el objeto de configuración.
 
         // Recuperamos los datos de conexión de RabbitMQ
         var rabbitConfig = config.GetSection("RabbitMQ");
 
 // Permite cambiar el servidor RabbitMQ mediante una variable de entorno
-string host = Environment.GetEnvironmentVariable("RABBITMQ_HOST")
-              ?? rabbitConfig["HostName"]!;        int port = int.Parse(rabbitConfig["Port"]!);
-        string user = rabbitConfig["UserName"]!;
-        string password = rabbitConfig["Password"]!;
-        string exchange = rabbitConfig["Exchange"]!;
+string host = Environment.GetEnvironmentVariable("RABBITMQ_HOST") 
+              ?? rabbitConfig["HostName"]!;// Si RABBITMQ_HOST no tiene ningún valor, utilizamos el HostName de appsettings.json.        
+        int port = int.Parse(rabbitConfig["Port"]!);// Obtenemos el puerto de conexión y lo convertimos a un número entero.
+        string user = rabbitConfig["UserName"]!;// Recuperamos el nombre de usuario configurado para acceder a RabbitMQ.
+        string password = rabbitConfig["Password"]!;// Recuperamos la contraseña de acceso a RabbitMQ.
+        string exchange = rabbitConfig["Exchange"]!; // Recuperamos el nombre del exchange al que se suscribirá el LogViewer.
 
-        // Creamos nuestro suscriptor
+        // Creamos nuestro suscriptor  pasando todos los datos necesarios para establecer la conexión con RabbitMQ.
         var subscriber = new Subscriber(
             host, port, user, password, exchange
         );
 
-        // Nos conectamos a RabbitMQ y comenzamos a escuchar
+        // Nos conectamos a RabbitMQ y comenzamos a escuchar los mensajes
         await subscriber.ConnectAsync();
 
        // Mantenemos el suscriptor activo para recibir mensajes
 Console.WriteLine("LogViewer escuchando mensajes. Pulsa Ctrl+C para finalizar.");
 
-await Task.Delay(Timeout.InfiniteTimeSpan);
+await Task.Delay(Timeout.InfiniteTimeSpan); // Mantenemos el programa ejecutándose indefinidamente para que pueda seguir recibiendo los mensajes de log que publique la API.
     }
 }
 /*
