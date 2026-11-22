@@ -142,6 +142,8 @@ public async Task<ActionResult> CrearInscripcion(CrearInscripcionDTO crearInscri
     if (crearInscripcionDTO.CompeticionesSeleccionadas == null ||
         crearInscripcionDTO.CompeticionesSeleccionadas.Count == 0)
     {
+        _logger.LogError(
+            "Error: No se ha seleccionado ninguna competición para la inscripción");
         ModelState.AddModelError(
             "CompeticionesSeleccionadas",
             "Debe seleccionar al menos una competición.");
@@ -156,6 +158,8 @@ public async Task<ActionResult> CrearInscripcion(CrearInscripcionDTO crearInscri
 
     if (idsCompeticiones.Distinct().Count() != idsCompeticiones.Count)
     {
+        _logger.LogError(
+            "Error: Se ha seleccionado la misma competición varias veces para la inscripción");
         ModelState.AddModelError(
             "CompeticionesSeleccionadas",
             "No se puede seleccionar una misma competición varias veces.");
@@ -198,6 +202,8 @@ public async Task<ActionResult> CrearInscripcion(CrearInscripcionDTO crearInscri
 
         if (plazasOcupadas >= competicion.Plazas)
         {
+            _logger.LogError(
+                $"No quedan plazas disponibles para la competición {competicion.Nombre}");
             ModelState.AddModelError(
                 "CompeticionesSeleccionadas",
                 $"No quedan plazas disponibles para la competición {competicion.Nombre}.");
@@ -238,6 +244,8 @@ public async Task<ActionResult> CrearInscripcion(CrearInscripcionDTO crearInscri
     // Validar el estado del modelo antes de guardar
     if (!ModelState.IsValid)
     {
+        _logger.LogError(
+            "Error: El estado del modelo no es válido al crear la inscripción");
         return BadRequest(new ValidationProblemDetails(ModelState));
     }
 
@@ -275,6 +283,8 @@ public async Task<ActionResult> CrearInscripcion(CrearInscripcionDTO crearInscri
             .ToList()
     );
     //DEVOLVEMOS EL OK Y EL DETAIL
+    _logger.LogInformation(
+        $"Inscripción creada con éxito para el cliente {cliente.UserName} con ID {inscripcion.Id}");
     return CreatedAtAction(
         nameof(GetInscripcion),
         new { id = inscripcion.Id },
