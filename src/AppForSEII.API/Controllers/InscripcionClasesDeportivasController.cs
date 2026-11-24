@@ -95,6 +95,7 @@ var clasesDeportivas = await _context.ClasesDeportivas
     .Include(cd => cd.TipoDeporte)
     .Where(cd => clasesIds.Contains(cd.Id))
     .ToListAsync();    // comprobamos que cada clase existe y tiene suficientes plazas (validar)
+    
 foreach (var item in inscripcionForCreate.ClasesInscritas)//por cada clase  que el cliente quiere reservar
 {//item es cada una de  esas clases
 
@@ -121,6 +122,10 @@ if (item.PlazasReservadas < 1 || item.PlazasReservadas > 3)
         ModelState.AddModelError("ClasesInscritas",$"Error, No hay suficientes plazas disponibles para la clase {clase.Descripcion}");
 
     }
+    if(clase!=null&&(clase.Descripcion.EndsWith("Online") || clase.Descripcion.EndsWith("Remota")))
+                {
+                    ModelState.AddModelError("Nombre","Error: el tipo de clase deportiva seleccionada no esta soportando en el sistema");
+                }
     
 }
     if (ModelState.ErrorCount > 0)//si aparecio algun error tipo por clase no existente o por plazas

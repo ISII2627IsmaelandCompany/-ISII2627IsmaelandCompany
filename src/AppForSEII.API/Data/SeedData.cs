@@ -152,6 +152,21 @@ namespace AppForSEII.API.Data {
 
         dbcontext.ClasesDeportivas.Add(claseDeportiva);//añadimos la clase al db context 
     }
+
+     if (dbcontext.ClasesDeportivas.FirstOrDefault(
+        c => c.Descripcion == "Entrenamiento tenis Online") == null)//comprobar si existe ya clase tenis
+    {//sino existe creamos la clase               descripcion            tenis          fecha y hora                         Lugar      Monitor   Nivel      plazas disponibles precio unitario
+        var claseDeportiva = new ClaseDeportiva("Clase de tenis Online",tiposDeporte[2],new DateTime(2026, 10, 8, 18, 0, 0),"Pista 3","Miguel","Intermedio",20,9.50m);
+
+        dbcontext.ClasesDeportivas.Add(claseDeportiva);//añadimos la clase al db context 
+    }
+     if (dbcontext.ClasesDeportivas.FirstOrDefault(
+        c => c.Descripcion == "Entrenamiento tenis Remota") == null)//comprobar si existe ya clase tenis
+    {//sino existe creamos la clase               descripcion            tenis          fecha y hora                         Lugar      Monitor   Nivel      plazas disponibles precio unitario
+        var claseDeportiva = new ClaseDeportiva("Clase de tenis Remota",tiposDeporte[2],new DateTime(2026, 10, 8, 18, 0, 0),"Pista 3","Miguel","Intermedio",20,9.50m);
+
+        dbcontext.ClasesDeportivas.Add(claseDeportiva);//añadimos la clase al db context 
+    }
     //guarda  las modificaciones de dbcontext en database
     dbcontext.SaveChanges();
 }
