@@ -12,6 +12,7 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
+
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
@@ -19,12 +20,17 @@
         </div>
 
         <div class="nav-item px-3">
-                <NavLink class="nav-link"
-                    href="/materialalquilado/listarmaterialesparaalquilar" id="CrearAlquiler">
-                    <span class="bi bi-plus-square-fill-nav-menu" ariahidden="true"></span> Alquilar material
+            <NavLink class="nav-link" href="/materialalquilado/listarmaterialesparaalquilar" id="CrearAlquiler">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Alquilar material
             </NavLink>
         </div>
 
+        @*acceso a la pantalla SELECT del CU4 *@
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/inscripciones/clases" id="CrearInscripcionClaseDeportiva">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Clases deportivas
+            </NavLink>
+        </div>
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="weather">
@@ -45,6 +51,7 @@
                         <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
                     </NavLink>
                 </div>
+
                 <div class="nav-item px-3">
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken />
@@ -55,12 +62,14 @@
                     </form>
                 </div>
             </Authorized>
+
             <NotAuthorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Register">
                         <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
                     </NavLink>
                 </div>
+
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Login">
                         <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
@@ -68,6 +77,7 @@
                 </div>
             </NotAuthorized>
         </AuthorizeView>
+
     </nav>
 </div>
 
@@ -91,4 +101,3 @@
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
 }
-

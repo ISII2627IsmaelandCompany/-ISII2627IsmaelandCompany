@@ -5,21 +5,21 @@ namespace AppForSEII.Web
 {
     public class InscripcionClaseDeportivaStateContainer
     {
-        // Inscripción que estamos preparando
+        //inscripción que estamos preparando
         public InscripcionClaseDeportivaForCreateDTO Inscripcion { get; private set; }
             = new InscripcionClaseDeportivaForCreateDTO()
             {
                 ClasesInscritas = new List<InscripcionClaseDeportivaItemDTO>()
             };
 
-        // Guardamos los datos originales de las clases seleccionadas
+        //guardamos los datos originales de las clases seleccionadas
         private readonly Dictionary<int, ClaseDeportivaForInscripcionDTO>
             clasesSeleccionadas = new();
 
         public IReadOnlyDictionary<int, ClaseDeportivaForInscripcionDTO>
             ClasesSeleccionadas => clasesSeleccionadas;
 
-        // Precio total del carrito
+        //precio total del carrito
         public double PrecioTotal
         {
             get
@@ -28,7 +28,7 @@ namespace AppForSEII.Web
             }
         }
 
-        // Notifica los cambios del carrito
+        //notifica los cambios del carrito
         public event Action? OnChange;
 
         private void NotifyStateChanged()
@@ -36,7 +36,7 @@ namespace AppForSEII.Web
             OnChange?.Invoke();
         }
 
-        // Añadir una clase deportiva al carrito
+        //añadir una clase deportiva al carrito
         public void AgregarClase(ClaseDeportivaForInscripcionDTO clase)
         {
             // No permitir clases sin plazas
@@ -45,7 +45,7 @@ namespace AppForSEII.Web
                 return;
             }
 
-            // Evitar añadir dos veces la misma clase
+            //evitar añadir dos veces la misma clase
             if (Inscripcion.ClasesInscritas.Any(
                 ci => ci.ClaseDeportivaId == clase.Id))
             {
@@ -69,7 +69,7 @@ namespace AppForSEII.Web
             NotifyStateChanged();
         }
 
-        // Eliminar una clase deportiva del carrito
+        //eliminar una clase deportiva del carrito
         public void EliminarClase(int claseDeportivaId)
         {
             var clase = Inscripcion.ClasesInscritas.FirstOrDefault(
@@ -84,7 +84,7 @@ namespace AppForSEII.Web
             }
         }
 
-        // Actualizar las plazas reservadas para una clase
+        //actualizar las plazas reservadas para una clase
         public void ActualizarPlazas(
             ClaseDeportivaForInscripcionDTO clase,
             int plazas)
@@ -102,13 +102,13 @@ namespace AppForSEII.Web
 
             item.PlazasReservadas = plazas;
 
-            // Recalcular el precio de esta clase
+            //recalcular el precio de esta clase
             item.Precio = clase.PrecioUnitario * plazas;
 
             NotifyStateChanged();
         }
 
-        // Vaciar el carrito
+        //vaciar el carrito
         public void VaciarCarrito()
         {
             if (Inscripcion.ClasesInscritas.Any())
@@ -120,7 +120,7 @@ namespace AppForSEII.Web
             }
         }
 
-        // Limpiar la inscripción después de procesarla
+        //limpiar la inscripción después de hacerla
         public void InscripcionProcesada()
         {
             Inscripcion = new InscripcionClaseDeportivaForCreateDTO()
