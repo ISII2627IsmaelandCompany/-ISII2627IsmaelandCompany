@@ -1,0 +1,309 @@
+
+@*ruta para acceder a la pantalla de seleccion de clases deportivas*@
+@page "/inscripciones/clases" 
+@*importamos el cliente y los DTOs de la Api*@
+@using AppForSEII.Web.API
+@*Para el autorize *@
+@using Microsoft.AspNetCore.Authorization
+@*inyectamos el cliente de la API para consultar las clases deportivas*@
+@inject AppForSEIIAPIClient API
+@* inyectamos el logger para registrar los errores *@
+@inject ILogger<ListarClasesDeportivasParaInscripcion> logger
+@* solo permitimos el acceso a usuarios autenticados *@
+@attribute [Authorize]
+@*el StateContainer para gestionar el carrito y conservar las clases seleccionadas*@
+
+@inject AppForSEII.Web.InscripcionClaseDeportivaStateContainer Estado
+@*para poder navegar del select al create*@
+@inject NavigationManager Navegacion
+@*titulo de la pestaña*@
+
+<PageTitle>Inscribirse a clases deportivas</PageTitle>
+@*contenedor principal de la interfaz*@
+<div class="container mt-4">
+
+    @*mostramos titulo y descripcion*@
+    <h3>Inscribirse a clases deportivas</h3>
+    <p>Selecciona las clases deportivas en las que deseas inscribirte.</p>
+
+    @*filtramos para buscar clases deportivas segun lo que pida el cliente*@
+    <div class="mb-3">
+
+        @*vinculamos el campo con la variable tipoDeporte con @bind *@
+        <label class="form-label">Tipo de deporte</label>
+        <input id="tipoDeporte" class="form-control"
+               placeholder="Ej. Tenis"
+               @bind="tipoDeporte" />
+
+        @*filtro para buscar por el nombre del monitor*@
+        <label class="form-label mt-2">Monitor</label>
+        <input id="monitor" class="form-control"
+               placeholder="Ej. Laura"
+               @bind="monitor" />
+
+        @*filtro para buscar por la fecha *@
+        <label class="form-label mt-2">Fecha</label>
+        <input id="fecha" type="date"
+               class="form-control"
+               @bind="fecha" />
+
+        @*al pulsar el boton llamamos a BuscarClases*@
+        <button id="buscarClases"
+                class="btn btn-primary mt-3"
+                @onclick="BuscarClases">
+            Buscar clases
+        </button>
+    </div>
+
+    @*si existe un mensaje de error lo mostramos*@
+    @if (mensajeError != null)
+    {
+        <div class="alert alert-warning" id="mensajeError">
+            @mensajeError
+        </div>
+    }
+
+    @*si la lista esta vacia , decimos que no hay clases*@
+    else if (clases.Count == 0)
+    {
+        <div class="alert alert-info">
+            No hay clases deportivas disponibles.
+        </div>
+    }
+    
+    @*si existen clases disponibles mostramos resultados*@
+    else
+    {
+        <p>Clases encontradas: @clases.Count</p>
+
+        @*tabla de clases*@
+        <div class="table-responsive">
+            <table class="table table-striped table-hover" id="tablaClases">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Deporte</th>
+                        <th>Monitor</th>
+                        <th>Nivel</th>
+                        <th>Fecha y hora</th>
+                        <th>Lugar</th>
+                        <th>Plazas</th>
+                        <th>Precio</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @*recorremos lista de clases y mostramos los datos de cada una*@
+                    @foreach (var clase in clases)
+                    {
+                        <tr>
+                            <td>@clase.Descripcion</td>
+                            <td>@clase.TipoDeporte</td>
+                            <td>@clase.Monitor</td>
+                            <td>@clase.Nivel</td>
+                            <td>@clase.FechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                            @*si el lugar==null mostramos no  especificado*@
+                            <td>@(clase.Lugar ?? "No especificado")</td>
+                            <td>@clase.PlazasDisponibles</td>
+                            <td>@clase.PrecioUnitario.ToString("F2") €</td>
+                            <td>
+                                @*añadimos la clase al carrito mediante el StateContainer, si ya esta seleccionada deshabilitamos boton para duplicados*@
+                                <button id="anadirClase_@clase.Id"
+                                        class="btn btn-outline-primary btn-sm"
+                                        disabled="@Estado.ClasesSeleccionadas.ContainsKey(clase.Id)"
+                                        @onclick="() => Estado.AgregarClase(clase)">
+                                    @(Estado.ClasesSeleccionadas.ContainsKey(clase.Id)
+                                        ? "Añadida"
+                                        : "Añadir")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @*carrito de las clases seleccionadas y permite gestionarlas*@
+    <div class="card mt-4">
+        <div class="card-body">
+
+            <h5 class="card-title">Carrito de inscripciones</h5>
+
+            @*si el carrito esta vacio *@
+            @if (Estado.Inscripcion.ClasesInscritas.Count == 0)
+            {
+                <p class="text-muted">
+                    Todavía no has seleccionado ninguna clase deportiva.
+                </p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table" id="tablaCarrito">
+                        <thead>
+                            <tr>
+                                <th>Clase</th>
+                                <th>Precio unitario</th>
+                                <th>Plazas</th>
+                                <th>Subtotal</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @*recorremos las clases almacenadas en el StateContainer*@
+                            @foreach (var item in Estado.Inscripcion.ClasesInscritas.ToList())
+                            {
+                                var claseOriginal =
+                                    Estado.ClasesSeleccionadas[item.ClaseDeportivaId];
+
+                                <tr>
+                                    <td>@item.Descripcion</td>
+
+                                    <td>
+                                        @claseOriginal.PrecioUnitario.ToString("F2") €
+                                    </td>
+
+                                    <td>
+                                        @*para modificar el numero de plazar . al cambiar valor llamamos a CambiarPlazas*@
+                                        <select id="plazas_@item.ClaseDeportivaId"
+                                                class="form-select form-select-sm"
+                                                value="@item.PlazasReservadas"
+                                                @onchange="e => CambiarPlazas(item.ClaseDeportivaId, e)">
+
+                                                @*reservar maximo 3 plazas*@
+                                            @for (int n = 1; n <= Math.Min(3, claseOriginal.PlazasDisponibles); n++)
+                                            {
+                                                <option value="@n">@n</option>
+                                            }
+                                        </select>
+                                    </td>
+
+                                    <td>
+                                        @item.Precio.ToString("F2") €
+                                    </td>
+
+                                    <td>
+                                        @*eliminamos la clase del carrito mediante su id*@
+                                        <button id="eliminarClase_@item.ClaseDeportivaId"
+                                                class="btn btn-outline-danger btn-sm"
+                                                @onclick="() => Estado.EliminarClase(item.ClaseDeportivaId)">
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    @*numero de clases seleccionadas*@
+                    Clases seleccionadas:
+                    <strong>@Estado.Inscripcion.ClasesInscritas.Count</strong>
+                </p>
+
+                <p>
+                    @*precio total calculado por el statecontainer*@
+                    <strong>
+                        Precio total: @Estado.PrecioTotal.ToString("F2") €
+                    </strong>
+                </p>
+                
+                @*eliminamos todas las clases seleccionadas del carrito*@
+                <button id="vaciarCarrito"
+                        class="btn btn-outline-danger"
+                        @onclick="Estado.VaciarCarrito">
+                    Vaciar carrito
+                </button>
+            }
+
+            @*continuar con el formulario, si el carrito esta vacio deshabilitamos boton*@
+            <div class="mt-3">
+                <button id="inscribirse"
+                        class="btn btn-primary"
+                        disabled="@(Estado.Inscripcion.ClasesInscritas.Count == 0)"
+                        @onclick="IrACrearInscripcion">
+                    Inscribirse
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@code {
+    //lista donde almacenamos las clases deportivas de la api
+    private ICollection<ClaseDeportivaForInscripcionDTO> clases =
+        new List<ClaseDeportivaForInscripcionDTO>();
+
+    //almacenan los filtros introducidos por el usuario
+    private string? tipoDeporte;
+    private string? monitor;
+    private DateTime? fecha;
+
+    //variable para mensaje error
+    private string? mensajeError;
+    //metodo que se ejecuta al iniciar
+    protected override async Task OnInitializedAsync()
+    {//cargamos las clases al entrar
+        await BuscarClases();
+    }
+
+    //metodo asincrono para consultar clases segun filtros
+    private async Task BuscarClases()
+    {//eliminamos mensaje  de error de la busqueda anterior
+        mensajeError = null;
+
+        //convertimos fecha al tipo DateTimeOffset  para la api
+        DateTimeOffset? fechaFiltro = fecha.HasValue
+            ? new DateTimeOffset(fecha.Value.Date)
+            : null;//si no selecciona  fecha mandamos null
+
+        try
+        {   //llamamos al select de la api pasando filtros
+            //si filtro vacio == null
+            //Trim compacta espacios o huecos sobrantes en texto
+            clases = await API.GetClasesDeportivasForInscripcionAsync(
+                string.IsNullOrWhiteSpace(tipoDeporte)
+                    ? null : tipoDeporte.Trim(),
+                string.IsNullOrWhiteSpace(monitor)
+                    ? null : monitor.Trim(),
+                fechaFiltro);
+        }
+        catch (ApiException ex) when (ex.StatusCode == 404)
+        {   //si la api  devuelve 404 vaciamos lista
+            // y mostramos que no  existen clases
+            clases = new List<ClaseDeportivaForInscripcionDTO>();
+            mensajeError = "No hay clases deportivas con esos criterios.";
+        }
+       catch (Exception ex)
+{
+    // registramos el error producido al consultar la API
+    logger.LogError(ex, "Error al cargar las clases deportivas.");
+
+    clases = new List<ClaseDeportivaForInscripcionDTO>();
+    mensajeError = "No se han podido cargar las clases deportivas.";
+}
+    }
+    //metodo que modifica el numero de plazas reservadas de una clase
+    private void CambiarPlazas(int claseDeportivaId, ChangeEventArgs e)
+    {   //convertimos el valor seleccionado en el desplegable a entero y buscamos clase por su id
+        if (int.TryParse(e.Value?.ToString(), out int plazas) &&
+            Estado.ClasesSeleccionadas.TryGetValue(
+                claseDeportivaId, out var clase))
+        {//actualizar plazas mediante statecontainer
+            Estado.ActualizarPlazas(clase, plazas);
+        }
+    }
+
+    //metodo  para navegar a la pantalla de creacion de inscripcion
+    private void IrACrearInscripcion()
+    {   //al menos una clase seleccionada
+        if (Estado.Inscripcion.ClasesInscritas.Count > 0)
+        {   //navegamos conservando el carrito
+            Navegacion.NavigateTo("/inscripciones/clases/crear");
+        }
+    }
+}
