@@ -1,0 +1,220 @@
+
+@*ruta para acceder a los details*@
+@page "/inscripciones/clases/detalles"
+
+@*imports Dtos, cliente api y herramientas de autorizacion*@
+@using AppForSEII.Web.API
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@*inyectamos el cliente de la api , logger y el servicio para obtener los datos del usuario autenticado*@
+@inject AppForSEIIAPIClient API
+@inject ILogger<DetallesInscripcionClaseDeportiva> logger
+@inject AuthenticationStateProvider Auth
+
+@*solo permitimos usuarios con el rol de cliente*@
+@attribute [Authorize(Roles = "Customer")]
+
+<PageTitle>Detalles de la inscripción</PageTitle>
+
+<div class="container mt-4">
+
+    <h3>Detalles de la inscripción</h3>
+
+    @*mostramos un mensaje mientras se realiza la consulta a la api*@
+    @if (cargando)
+    {
+        <p>Cargando los detalles de la inscripción...</p>
+    }
+    else if (inscripcion == null)
+    {
+        @*si inscripcion no es valida , error*@
+        <div class="alert alert-warning" id="mensajeError">
+            @mensajeError
+        </div>
+    }
+    else
+    {
+        @* datos personales del cliente *@
+        <h5 class="mt-4">Datos del cliente</h5>
+
+        <table class="table table-borderless table-sm">
+            <tr>
+                <th>Nombre</th>
+                <td id="nombre">@inscripcion.Nombre</td>
+            </tr>
+            <tr>
+                <th>Apellidos</th>
+                <td id="apellidos">@inscripcion.Apellidos</td>
+            </tr>
+            <tr>
+                <th>DNI</th>
+                <td id="dni">@inscripcion.Dni</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td id="email">@inscripcion.Email</td>
+            </tr>
+            <tr>
+                <th>Teléfono</th>
+                <td id="telefono">@inscripcion.Telefono</td>
+            </tr>
+        </table>
+
+        @* información general de la inscripción *@
+        <h5 class="mt-4">Datos de la inscripción</h5>
+
+        <table class="table table-borderless table-sm">
+            <tr>
+                <th>Número de inscripción</th>
+                <td id="idInscripcion">@inscripcion.Id</td>
+            </tr>
+            <tr>
+                <th>Fecha de inscripción</th>
+                <td id="fechaInscripcion">
+                    @inscripcion.FechaInscripcion.ToString("dd/MM/yyyy")
+                </td>
+            </tr>
+            <tr>
+                <th>Método de pago</th>
+                <td id="metodoPago">@inscripcion.MetodoPago</td>
+            </tr>
+        </table>
+
+        @* mostramos las clases asociadas a la inscripción *@
+        <h5 class="mt-4">Clases deportivas inscritas</h5>
+
+        <div class="table-responsive">
+
+            <table class="table table-striped" id="tablaClasesInscritas">
+                <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Deporte</th>
+                        <th>Fecha y hora</th>
+                        <th>Plazas reservadas</th>
+                        <th>Precio</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @*recorremos las clases inscritas que contiene el dto y mostramos datos de cada una*@
+                    @foreach (var clase in inscripcion.ClasesInscritas)
+                    {
+                        <tr id="claseInscrita_@clase.ClaseDeportivaId">
+                            <td>@clase.Descripcion</td>
+                            <td>@clase.TipoDeporte</td>
+                            <td>
+                                @clase.FechaHora.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td>@clase.PlazasReservadas</td>
+                            <td>@clase.Precio.ToString("F2") €</td>
+                            <td>
+                                @*si observaciones == null , mostramos texto alternativo*@
+                                @(clase.Observaciones ?? "Sin observaciones")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                @*mostramos resumen final de plazas y precio total*@
+                <tfoot>
+                    <tr>
+                        <th colspan="3" class="text-end">
+                            Total
+                        </th>
+                        <td id="totalPlazas">
+                            @inscripcion.ClasesInscritas.Sum(c => c.PlazasReservadas)
+                        </td>
+                        <td id="precioTotal">
+                            <strong>
+                                @inscripcion.PrecioTotal.ToString("F2") €
+                            </strong>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+
+            </table>
+
+        </div>
+    }
+
+</div>
+
+@code {
+    // recibimos el id de la inscripción desde la URL
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "id")]
+    public int? Id { get; set; }
+    //dto donde almacenamos los detalles obtenidos de la api
+    private InscripcionClaseDeportivaDetailDTO? inscripcion;
+    //variables para controlar los errores y estado de carga
+    private string? mensajeError;
+    private bool cargando = true;
+
+    // se ejecuta cuando el componente recibe sus parámetros
+    // permite volver a consultar la api si cambia el id de la URL
+    protected override async Task OnParametersSetAsync()
+    {
+        cargando = true;
+        inscripcion = null;
+        mensajeError = null;
+
+        try
+        {
+            // comprobamos que el identificador es válido
+            if (!Id.HasValue || Id.Value <= 0)
+            {
+                mensajeError = "El identificador de la inscripción no es válido.";
+                return;
+            }
+
+            // obtenemos el usuario autenticado
+            var authState = await Auth.GetAuthenticationStateAsync();
+            var usuario = authState.User;
+
+            //obtenemos sus correo electronico para identificar propietario
+            //si no existe el email, utilizamos el nombre de usuaio
+            var emailUsuario = usuario.FindFirst(ClaimTypes.Email)?.Value
+                ?? usuario.Identity?.Name;
+            //comprobamos que el user esta autenticado y podemos identificarlo
+            if (usuario.Identity?.IsAuthenticated != true ||
+                string.IsNullOrWhiteSpace(emailUsuario))
+            {
+                mensajeError = "No tienes autorización para consultar esta inscripción.";
+                return;
+            }
+
+            // consultamos el GET details de la API pasando id de la inscripcion
+            var resultado = await API.GetInscripcionAsync(Id.Value);
+
+            // comprobamos que la inscripción pertenece al user autenticado y que existe la inscripcion
+            //comparamos correos sin distinguir mayusculas y minisculas
+            if (resultado == null ||
+                !string.Equals(resultado.Email, emailUsuario,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                mensajeError = "No existe la inscripción o no tienes autorización para consultarla.";
+                return;
+            }
+
+            //solo mostramos los datos si se han pasado comprobaciones
+            inscripcion = resultado;
+        }
+        catch (ApiException ex) when (ex.StatusCode == 404)
+        {   //controlamos caso inscripcion no existe o no tienes autorizacion para verla
+            mensajeError = "No existe la inscripción o no tienes autorización para consultarla.";
+        }
+        catch (Exception ex)
+        {// registramos otros errores, como un fallo de conexión con la API
+            logger.LogError(ex, "Error al consultar la inscripción.");
+
+            mensajeError = "No se han podido cargar los detalles de la inscripción.";
+        }
+        finally
+        { //finalizamos el estado de carga tanto si es exitosa como si hay algun error
+            cargando = false;
+        }
+    }
+}
