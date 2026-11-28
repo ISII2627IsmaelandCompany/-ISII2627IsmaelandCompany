@@ -14,8 +14,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
     // Registramos el contenedor de estado para las inscripciones deportivas
 builder.Services.AddScoped<InscripcionClaseDeportivaStateContainer>();
+
+    // Registramos el contenedor de estado para las reservas de pistas
+builder.Services.AddScoped<PistaReservadaStateContainer>();//el addscoped sirve para registrar el contenedor para que Blazor pueda inyectarlo en los componentes. Cada sesión de usuario tendrá su propia instancia dentro de su ámbito.
+
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityRedirectManager>();
